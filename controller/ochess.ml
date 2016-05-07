@@ -709,5 +709,5 @@ let main () =
     Start playing
 *)
 
-let () = main ()
+(* let () = main () *)
 
