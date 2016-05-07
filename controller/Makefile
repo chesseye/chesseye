@@ -3,29 +3,39 @@ OCAMLBUILD= ocamlbuild \
 		-libs str \
 		-tags debug,annot
 
-MAIN=ochess
-MAINSIM=simul
+RMLBUILD= rmlbuild \
+		-no-links -classic-display \
+		-libs str \
+		-tags debug,annot
+
 TARGET=native
 
-all: $(MAIN) $(MAINSIM)
+all: controller ochess simul
 
-$(MAIN): $(MAIN).$(TARGET)
-	cp _build/$(MAIN).$(TARGET) $(MAIN)
+controller: controller.rml.$(TARGET)
+	cp _build/controller.rml.$(TARGET) controller
 
-$(MAINSIM): $(MAINSIM).$(TARGET)
-	cp _build/$(MAINSIM).$(TARGET) $(MAINSIM)
+ochess: ochess.$(TARGET)
+	cp _build/ochess.$(TARGET) ochess
 
-$(MAIN).$(TARGET):
-	$(OCAMLBUILD) $(MAIN).$(TARGET)
+simul: simul.$(TARGET)
+	cp _build/simul.$(TARGET) simul
 
-$(MAINSIM).$(TARGET):
-	$(OCAMLBUILD) $(MAINSIM).$(TARGET)
+controller.rml.$(TARGET):
+	$(RMLBUILD) controller.rml.$(TARGET)
+
+
+ochess.$(TARGET):
+	$(OCAMLBUILD) ochess.$(TARGET)
+
+simul.$(TARGET):
+	$(OCAMLBUILD) simul.$(TARGET)
 
 
 clean:
 	ocamlbuild -clean
 
 realclean: clean
-	rm -f *~ $(MAIN)
+	rm -f *~ ochess simul
 
 cleanall: realclean

@@ -1,0 +1,4 @@
+let process main =
+  print_endline "The ChessEye controller is running"
+
+let () = run main
