@@ -37,6 +37,10 @@ if __name__ == "__main__":
             for x,y in corners:
                 cv2.circle(frame, (x,y), 5, 255, -1) 
 
+        # Thresholded. The chessboard should be black/white after this step.
+        binary = pipeline.binarize(bw, 0.2)
+
+        cv2.imshow("binary", binary)
         cv2.imshow("frame", frame)
 
     cap.release()
