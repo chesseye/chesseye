@@ -52,6 +52,19 @@ let print_positions f positions =
   List.iter (fun x -> output_string oc x; output_char oc '\n') bitmaps;
   close_out oc
 
+let make_dmove pos dmove =
+  match dmove with
+  | Types.DNoMove -> pos
+  | Types.DMove (i1,i2,i3,i4) ->
+      make_move pos (Types.Move (i1,i2,i3,i4)) 0
+  | Types.DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
+      make_move pos (Types.Move (i1,i2,i3,i4)) 0
+  | Types.DQueenside_castle ->
+      make_move pos Types.Queenside_castle 0
+  | Types.DKingside_castle ->
+      make_move pos Types.Kingside_castle 0
+  | Types.DError -> print_endline "Error in detected move"; pos
+    
 let _ =
   begin
     let positions = positions_of_file "sample1.eye" in
