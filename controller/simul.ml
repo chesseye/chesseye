@@ -12,10 +12,8 @@ let string_of_file file =
     Buffer.contents buf
   with
     Sys_error err ->
-      Printf.eprintf
-        "Could not read the file %s, got error Sys_error %s\n@?"
-        file
-        err;
+      Util.warning
+        ("Could not read the file " ^ file ^ ", got error Sys_error " ^ err);
       raise(Sys_error err)
 
 let positions_of_file f =
@@ -39,7 +37,7 @@ let positions_of_file f =
   in
   begin
     List.iter proc_one_move str_moves;
-    print_endline ("Read " ^ (string_of_int !num) ^ " lines");
+    Util.warning ("Read " ^ (string_of_int !num) ^ " lines");
     List.rev (!allpos)
   end
 
@@ -52,8 +50,15 @@ let print_positions f positions =
   List.iter (fun x -> output_string oc x; output_char oc '\n') bitmaps;
   close_out oc
 
+let print_positions f positions =
+  let bitmaps = bitmaps_of_positions positions in
+  let oc = open_out f in
+  List.iter (fun x -> output_string oc x; output_char oc '\n') bitmaps;
+  close_out oc
+
 let _ =
   begin
     let positions = positions_of_file "sample1.eye" in
     print_positions "sample1.bmp" positions
   end
+

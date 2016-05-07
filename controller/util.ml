@@ -1,5 +1,8 @@
 open Types
 
+let warning s =
+  Printf.eprintf "%s" s
+  
 let string_of_field color f =
   match f with
   | Empty -> "0"
