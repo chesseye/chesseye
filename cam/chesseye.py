@@ -46,10 +46,23 @@ if __name__ == "__main__":
 
         # Looking for lines now
         lines = cv2.HoughLines(thick_edges, 1, np.pi / 180, int(min_board_size))
+        h_lines = []
+        v_lines = []
         if lines is not None:
             lines = lines.reshape(-1, 2)
             for rho,theta in lines:
+                is_v = False
+                is_h = False
                 a = np.cos(theta)
+                # A value of `a` close to 1 or -1 means horizontal
+                # A value of `a` close to 0 means vertical
+                if abs(a) < 0.1:
+                    v_lines.append((rho,theta))
+                    is_v = True
+                elif abs(1.0 - abs(a)) < 0.1:
+                    h_lines.append((rho,theta))
+                    is_h = True
+
                 b = np.sin(theta)
                 x0 = a*rho
                 y0 = b*rho
@@ -57,10 +70,19 @@ if __name__ == "__main__":
                 y1 = int(y0 + 1000*(a))
                 x2 = int(x0 - 1000*(-b))
                 y2 = int(y0 - 1000*(a))
-                cv2.line(frame,(x1,y1),(x2,y2),(0,255,0),1)
+                if is_v:
+                    color = (0,255,0) # green
+                elif is_h:
+                    color = (0,0,255) # red
+                else:
+                    color = (80,80,80) # some gray
 
-        cv2.imshow("binary", binary)
-        cv2.imshow("edges", thick_edges)
+                cv2.line(frame,(x1,y1),(x2,y2),color,1)
+
+        if h_lines and v_lines and corners:
+            # TODO: check distance between corners and lines and filter out corners not on both v and h lines
+            pass
+
         cv2.imshow("frame", frame)
 
         # END OF WHILE LOOP
