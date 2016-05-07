@@ -10,7 +10,7 @@ if __name__ == "__main__":
         # We read from a pre-recorded video
         cap = cv2.VideoCapture(sys.argv[1])
     else:
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
 
     while True:
         ret, frame = cap.read()
@@ -39,8 +39,13 @@ if __name__ == "__main__":
 
         # Thresholded. The chessboard should be black/white after this step.
         binary = pipeline.binarize(bw, 0.2)
+        # Edge detector.
+        edges = cv2.Canny(binary, 100, 250, apertureSize = 3)
+        # Thicker edges.
+        thick_edges = cv2.dilate(edges, cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3)))
 
         cv2.imshow("binary", binary)
+        cv2.imshow("edges", thick_edges)
         cv2.imshow("frame", frame)
 
     cap.release()
