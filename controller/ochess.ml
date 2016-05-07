@@ -286,10 +286,10 @@ let rec checked_directions pos c pt_list x y lst num =
                       || checked_directions pos c pt_list x y t       num))
 
 let checked pos t x y = 
-    checked_directions pos t [Rook;   Queen] x y rook   10 or
-    checked_directions pos t [Bishop; Queen] x y bishop 10 or
-    checked_directions pos t [Knight]        x y knight 1 or
-    checked_directions pos t [King]          x y queen  1 or
+    checked_directions pos t [Rook;   Queen] x y rook   10 ||
+    checked_directions pos t [Bishop; Queen] x y bishop 10 ||
+    checked_directions pos t [Knight]        x y knight 1 ||
+    checked_directions pos t [King]          x y queen  1 ||
     let tmp = if t = White then pawn_white_cap else pawn_black_cap in
     checked_directions pos t [Pawn]          x y tmp    1
 
