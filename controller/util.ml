@@ -169,3 +169,20 @@ let dmove_of_masks (mask1:mask) (mask2:mask): dmove =
   | [ _ ; _ ; _ ] -> DError *)
   end
 
+let detect_promotion pos (i1,i2,i3,i4) =
+  (* To be done *)
+  make_move pos (Types.Move (i1,i2,i3,i4)) 0
+    
+let make_dmove pos dmove =
+  match dmove with
+  | Types.DNoMove -> pos
+  | Types.DMove (i1,i2,i3,i4) ->
+      detect_promotion pos (i1,i2,i3,i4)
+  | Types.DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
+      make_move pos (Types.Move (i1,i2,i3,i4)) 0
+  | Types.DQueenside_castle ->
+      make_move pos Types.Queenside_castle 0
+  | Types.DKingside_castle ->
+      make_move pos Types.Kingside_castle 0
+  | Types.DError -> print_endline "Error in detected move"; pos
+    
