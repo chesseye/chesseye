@@ -5,11 +5,6 @@ val draw_by_repetition_aux : position -> position -> int -> bool
 val draw_by_repetition : position -> bool
 val draw_by_lack_of_progress : position -> bool
 val draw : position -> bool
-type move =
-    Move of int * int * int * int
-  | Kingside_castle
-  | Queenside_castle
-  | Promotion of piece_type * int * int
 val opposite_color : color -> color
 val color_sign : color -> int
 val piece_chars : (piece_type * char) list

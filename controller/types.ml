@@ -19,3 +19,9 @@ type position = { ar: board;
                   king_w : (int*int); king_b : (int * int); (* king positions are required often *)
                   number : int; (* position number, initial position is 0 *)
                   eval : int} (* essentially, memoized value of eval for this position *)
+
+type mask = color option array array
+
+type move = Move of int * int * int * int
+          | Kingside_castle | Queenside_castle
+          | Promotion of piece_type * int * int (* the int's are initial column and final column *)

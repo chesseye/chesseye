@@ -74,10 +74,6 @@ let draw_by_repetition pos = draw_by_repetition_aux pos pos 2
 let draw_by_lack_of_progress pos = pos.irr_change >= 100
 
 let draw pos = draw_by_lack_of_progress pos || draw_by_repetition pos
- 
-type move = Move of int * int * int * int 
-          | Kingside_castle | Queenside_castle 
-          | Promotion of piece_type * int * int (* the int's are initial column and final column *)
 
 let opposite_color = function Black -> White | White -> Black
 
