@@ -4,15 +4,22 @@ OCAMLBUILD= ocamlbuild \
 		-tags debug,annot
 
 MAIN=ochess
+MAINSIM=simul
 TARGET=native
 
-all: $(MAIN)
+all: $(MAIN) $(MAINSIM)
 
-$(MAIN): $(MAIN).$(TARET)
+$(MAIN): $(MAIN).$(TARGET)
 	cp _build/$(MAIN).$(TARGET) $(MAIN)
 
-$(MAIN).$(TARET):
+$(MAINSIM): $(MAINSIM).$(TARGET)
+	cp _build/$(MAINSIM).$(TARGET) $(MAINSIM)
+
+$(MAIN).$(TARGET):
 	$(OCAMLBUILD) $(MAIN).$(TARGET)
+
+$(MAINSIM).$(TARGET):
+	$(OCAMLBUILD) $(MAINSIM).$(TARGET)
 
 
 clean:
