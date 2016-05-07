@@ -33,16 +33,13 @@ if __name__ == "__main__":
 
         # Tracking features, hopefully finding lots of corners
         corners = pipeline.get_corners(bw, 100, min_board_size / 12)
-        if corners:
-            for x,y in corners:
-                cv2.circle(frame, (x,y), 5, 255, -1) 
 
         # Thresholded. The chessboard should be black/white after this step.
         binary = pipeline.binarize(bw, 0.2)
         # Edge detector.
         edges = cv2.Canny(binary, 100, 250, apertureSize = 3)
         # Thicker edges.
-        thick_edges = cv2.dilate(edges, cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3)))
+        thick_edges = cv2.dilate(edges, cv2.getStructuringElement(cv2.MORPH_CROSS,(4,4)))
 
         # Looking for lines now
         lines = cv2.HoughLines(thick_edges, 1, np.pi / 180, int(min_board_size))
@@ -54,34 +51,61 @@ if __name__ == "__main__":
                 is_v = False
                 is_h = False
                 a = np.cos(theta)
-                # A value of `a` close to 1 or -1 means horizontal
-                # A value of `a` close to 0 means vertical
+                # A value of `a` close to 1 or -1 means vertical
+                # A value of `a` close to 0 means horizontal
                 if abs(a) < 0.1:
-                    v_lines.append((rho,theta))
-                    is_v = True
-                elif abs(1.0 - abs(a)) < 0.1:
                     h_lines.append((rho,theta))
                     is_h = True
+                elif abs(1.0 - abs(a)) < 0.1:
+                    v_lines.append((rho,theta))
+                    is_v = True
 
-                b = np.sin(theta)
-                x0 = a*rho
-                y0 = b*rho
-                x1 = int(x0 + 1000*(-b))
-                y1 = int(y0 + 1000*(a))
-                x2 = int(x0 - 1000*(-b))
-                y2 = int(y0 - 1000*(a))
                 if is_v:
                     color = (0,255,0) # green
                 elif is_h:
-                    color = (0,0,255) # red
+                    color = (0,255,0) # red
                 else:
                     color = (80,80,80) # some gray
 
+                (x1,y1),(x2,y2) = pipeline.hough_to_two_points(rho, theta)
                 cv2.line(frame,(x1,y1),(x2,y2),color,1)
 
         if h_lines and v_lines and corners:
-            # TODO: check distance between corners and lines and filter out corners not on both v and h lines
-            pass
+            good_corners = []
+            # Check all the ones close to a h_line
+            is_on_h = np.array(False * len(corners), np.bool_)
+
+            for rho,theta in h_lines:
+                distances = pipeline.hough_dist(corners, rho, theta)
+                close = distances < 5 # arbitrary
+                is_on_h = np.bitwise_or(is_on_h, close)
+
+            # Check all the ones close to a v_line
+            is_on_v = np.array(False * len(corners), np.bool_)
+            for rho,theta in v_lines:
+                distances = pipeline.hough_dist(corners, rho, theta)
+                close = distances < 5 # arbitrary
+                is_on_v = np.bitwise_or(is_on_v, close)
+
+            for i,(x,y) in enumerate(corners):
+                if is_on_h[i] and is_on_v[i]:
+                    cv2.circle(frame, (x,y), 5, 255, -1)
+                    good_corners.append((x,y))
+                else:
+                    cv2.circle(frame, (x,y), 5, 255)
+
+            if good_corners:
+                good_corners_xs, good_corners_ys = [ list(t) for t in zip(*good_corners) ]
+
+                top_left = (min(good_corners_xs), min(good_corners_ys))
+                bot_right = (max(good_corners_xs), max(good_corners_ys))
+
+                dim1 = bot_right[0] - top_left[0]
+                dim2 = bot_right[1] - top_left[1]
+                ratio = float(dim1) / float(dim2)
+    
+                if ratio > 1.1 and ratio < 1.3:
+                    cv2.rectangle(frame, (min(good_corners_xs), min(good_corners_ys)), (max(good_corners_xs), max(good_corners_ys)), (0,0,255), 2)
 
         cv2.imshow("frame", frame)
 
