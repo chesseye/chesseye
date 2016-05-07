@@ -52,11 +52,15 @@ let print_positions f positions =
   List.iter (fun x -> output_string oc x; output_char oc '\n') bitmaps;
   close_out oc
 
+let detect_promotion pos (i1,i2,i3,i4) =
+  (* To be done *)
+  make_move pos (Types.Move (i1,i2,i3,i4)) 0
+    
 let make_dmove pos dmove =
   match dmove with
   | Types.DNoMove -> pos
   | Types.DMove (i1,i2,i3,i4) ->
-      make_move pos (Types.Move (i1,i2,i3,i4)) 0
+      detect_promotion pos (i1,i2,i3,i4)
   | Types.DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
       make_move pos (Types.Move (i1,i2,i3,i4)) 0
   | Types.DQueenside_castle ->
