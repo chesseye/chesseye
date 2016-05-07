@@ -27,6 +27,7 @@ type move = Move of int * int * int * int
           | Promotion of piece_type * int * int (* the int's are initial column and final column *)
 
 type premove =
-    PreMove of int * int * int * int
+  | PreNoMove
+  | PreMove of int * int * int * int
   | PreCastle
 

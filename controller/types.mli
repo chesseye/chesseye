@@ -24,6 +24,7 @@ type move =
   | Queenside_castle
   | Promotion of piece_type * int * int
 type premove =
-    PreMove of int * int * int * int
+  | PreNoMove
+  | PreMove of int * int * int * int
   | PreCastle
 
