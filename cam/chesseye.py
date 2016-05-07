@@ -10,6 +10,24 @@ def now():
     millis = int(round(time.time() * 1000))
     return millis
 
+# Applies a closure on all bw square sub-images, and returns the re-patched image.
+def apply_per_square(bw, f):
+    assert(bw.shape == (800,800))
+
+    # i = 0, j = 0 = top left = a8 if board is straight
+    squares = []
+    for i in range(0,8):
+        row = []
+        for j in range(0,8):
+            s = bw[(i*100):((i+1)*100),(j*100):((j+1)*100)]
+            fs = f(s)
+            row.append(fs)
+
+        squares.append(row)
+
+    rows = [ np.hstack(r) for r in squares ]
+    return np.vstack(rows)
+
 # Frame should be BW
 def find_homography(frame):
     debug = True
@@ -22,11 +40,11 @@ def find_homography(frame):
     img_max = max(img_h, img_w)
     img_min = min(img_h, img_w)
 
-    # Grayscale
-    bw = pipeline.to_gray(frame)
-
     # Minimum expected size of the board (arbitrary)
     min_board_size = 0.7 * img_min
+    
+    # Grayscale
+    bw = pipeline.to_gray(frame)
     
     # Tracking features, hopefully finding lots of corners
     corners = pipeline.get_corners(bw, 100, min_board_size / 12)
@@ -149,17 +167,24 @@ if __name__ == "__main__":
         if not ret or cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+        cv2.imshow("frame", frame)
+
         if homography is None: # or now() - homography_ts > 5000:
             new_h = find_homography(frame)
             if new_h is not None:
                 homography = new_h
                 homography_ts = now()
 
-        if homography is not None:
-            reproj = cv2.warpPerspective(frame, homography, (800, 800))
-            cv2.imshow("reproj", reproj)
+        if homography is None:
+            continue # We can't do anything until we have a lock on the board
 
-        cv2.imshow("frame", frame)
+        reproj = cv2.warpPerspective(frame, homography, (800, 800))
+        bw_reproj = pipeline.to_gray(reproj)
+        cv2.imshow("reproj", reproj)
+
+        # equalized = apply_per_square(bw_reproj, lambda f: cv2.equalizeHist(f))
+        equalized = cv2.equalizeHist(bw_reproj)
+        cv2.imshow("equalized", equalized)
 
         # END OF WHILE LOOP
 
