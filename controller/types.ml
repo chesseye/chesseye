@@ -30,4 +30,5 @@ type dmove =
   | DNoMove
   | DMove of int * int * int * int
   | DCastle
+  | DError
 
