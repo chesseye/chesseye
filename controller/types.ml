@@ -29,6 +29,7 @@ type move = Move of int * int * int * int
 type dmove =
   | DNoMove
   | DMove of int * int * int * int
+  | DEnPassant of color * (int * int * int * int) * (int * int)
   | DCastle
   | DError
 
