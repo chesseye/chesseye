@@ -50,15 +50,26 @@ let print_positions f positions =
   List.iter (fun x -> output_string oc x; output_char oc '\n') bitmaps;
   close_out oc
 
-let print_positions f positions =
-  let bitmaps = bitmaps_of_positions positions in
+let print_positions f bitmaps =
   let oc = open_out f in
   List.iter (fun x -> output_string oc x; output_char oc '\n') bitmaps;
   close_out oc
 
+let emit_position bitmap =
+  let nb_emit = Random.int 100 in
+  for i = 0 to nb_emit do
+    Thread.delay 0.01;
+    print_endline bitmap
+  done
+    
+let emit_positions bitmaps =
+  List.iter emit_position bitmaps
+    
 let _ =
   begin
     let positions = positions_of_file "sample1.eye" in
-    print_positions "sample1.bmp" positions
+    let bitmaps = bitmaps_of_positions positions in
+    emit_positions bitmaps
+    (* print_positions "sample1.bmp" positions *)
   end
 

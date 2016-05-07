@@ -1,7 +1,7 @@
 OCAMLBUILD= ocamlbuild \
 		-no-links -classic-display \
-		-libs str \
-		-tags debug,annot
+		-libs str,unix \
+		-tags debug,annot,thread
 
 RMLBUILD= rmlbuild \
 		-no-links -classic-display \
