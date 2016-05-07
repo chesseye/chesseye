@@ -44,9 +44,26 @@ if __name__ == "__main__":
         # Thicker edges.
         thick_edges = cv2.dilate(edges, cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3)))
 
+        # Looking for lines now
+        lines = cv2.HoughLines(thick_edges, 1, np.pi / 180, int(min_board_size))
+        if lines is not None:
+            lines = lines.reshape(-1, 2)
+            for rho,theta in lines:
+                a = np.cos(theta)
+                b = np.sin(theta)
+                x0 = a*rho
+                y0 = b*rho
+                x1 = int(x0 + 1000*(-b))
+                y1 = int(y0 + 1000*(a))
+                x2 = int(x0 - 1000*(-b))
+                y2 = int(y0 - 1000*(a))
+                cv2.line(frame,(x1,y1),(x2,y2),(0,255,0),1)
+
         cv2.imshow("binary", binary)
         cv2.imshow("edges", thick_edges)
         cv2.imshow("frame", frame)
+
+        # END OF WHILE LOOP
 
     cap.release()
     cv2.destroyAllWindows()  
