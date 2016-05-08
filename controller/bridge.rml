@@ -3,8 +3,10 @@ let bridge s =
   try
     while true do
       let line = input_line stdin in
-      let m = mask_of_string line in
-      Rml_async.safe_emit s m
+      begin match parse_message line with
+      | Some m -> Rml_async.safe_emit s m
+      | None -> ()
+      end
     done
   with
   | _ -> ()

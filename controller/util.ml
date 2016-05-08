@@ -16,7 +16,7 @@ let print_mask m =
     print_string "\n      a    b    c    d    e    f    g    h\n"
 
 let warning s =
-  Printf.eprintf "%s" s
+  Printf.eprintf "%s\n" s
 
 let string_of_field color f =
   match f with
@@ -194,21 +194,29 @@ let dmove_of_masks (m1:mask) (m2:mask): dmove =
 
 let detect_promotion pos (i1,i2,i3,i4) =
   (* To be done *)
-  Ochess.make_move pos (Types.Move (i1,i2,i3,i4)) 0
+  Ochess.make_move pos (Move (i1,i2,i3,i4)) 0
 
 let make_dmove pos dmove =
   match dmove with
-  | Types.DNoMove -> pos
-  | Types.DMove (i1,i2,i3,i4) ->
+  | DNoMove -> pos
+  | DMove (i1,i2,i3,i4) ->
       detect_promotion pos (i1,i2,i3,i4)
-  | Types.DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
-      Ochess.make_move pos (Types.Move (i1,i2,i3,i4)) 0
-  | Types.DQueenside_castle ->
-      Ochess.make_move pos Types.Queenside_castle 0
-  | Types.DKingside_castle ->
-      Ochess.make_move pos Types.Kingside_castle 0
-  | Types.DError -> print_endline "Error in detected move"; pos
+  | DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
+      Ochess.make_move pos (Move (i1,i2,i3,i4)) 0
+  | DQueenside_castle ->
+      Ochess.make_move pos Queenside_castle 0
+  | DKingside_castle ->
+      Ochess.make_move pos Kingside_castle 0
+  | DError -> print_endline "Error in detected move"; pos
 
 let mask_of_position pos =
   (mask_of_string (string_of_position pos))
 
+let parse_message msg =
+  begin match String.sub msg 0 4 with
+  | "MASK" ->
+      Some (mask_of_string (String.sub msg 5 128))
+  | _ ->
+      warning ("Bad message: "^msg);
+      None
+  end

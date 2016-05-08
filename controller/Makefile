@@ -10,7 +10,7 @@ RMLBUILD= rmlbuild \
 
 TARGET=native
 
-all: controller ochess simul
+all: controller ochess simul slowdown
 
 controller: controller.rml.$(TARGET)
 	cp _build/controller.rml.$(TARGET) controller
@@ -21,6 +21,9 @@ ochess: ochess.$(TARGET)
 simul: simul.$(TARGET)
 	cp _build/simul.$(TARGET) simul
 
+slowdown: slowdown.$(TARGET)
+	cp _build/slowdown.$(TARGET) slowdown
+
 controller.rml.$(TARGET):
 	$(RMLBUILD) controller.rml.$(TARGET)
 
@@ -30,6 +33,9 @@ ochess.$(TARGET):
 
 simul.$(TARGET):
 	$(OCAMLBUILD) simul.$(TARGET)
+
+slowdown.$(TARGET):
+	$(OCAMLBUILD) slowdown.$(TARGET)
 
 
 clean:

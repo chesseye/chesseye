@@ -42,7 +42,9 @@ let positions_of_file f =
   end
 
 let bitmaps_of_positions positions =
-  List.map Util.string_of_position positions
+  List.map
+    (fun pos -> "MASK "^(Util.string_of_position pos))
+    positions
 
 let print_positions f positions =
   let bitmaps = bitmaps_of_positions positions in
