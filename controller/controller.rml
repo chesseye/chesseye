@@ -83,14 +83,15 @@ let keep_last x y =
 let process advice_engine pos_input advice_output =
   loop
     await pos_input (Some pos) in
-    let smove = run Rml_async.proc_of_fun Ochess.suggest_move pos in
-    (* let smove = Ochess.suggest_move pos in *)
-    begin match last ?pos_input with
-    | Some p ->
-        if p.number = pos.number then
-          emit advice_output (pos, smove)
-    | None -> ()
-    end
+    if List.mem pos.turn Config.advices then
+      let smove = run Rml_async.proc_of_fun Ochess.suggest_move pos in
+      (* let smove = Ochess.suggest_move pos in *)
+      begin match last ?pos_input with
+      | Some p ->
+          if p.number = pos.number then
+            emit advice_output (pos, smove)
+      | None -> ()
+      end
   end
 
 
