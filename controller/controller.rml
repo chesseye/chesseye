@@ -29,6 +29,14 @@ let keep_last x y =
       Some x
   end
 
+let process advice pos_input =
+  loop
+    await pos_input (Some pos) in
+    let smove = Ochess.suggest_move pos in
+    let msg = Ochess.string_of_move pos smove in
+    print_endline ("MOVE "^msg)
+  end
+
 let process main =
   print_endline "The ChessEye controller is running";
   signal mask default None gather keep_last in
@@ -40,6 +48,8 @@ let process main =
     run position_of_mask mask position Ochess.init_position
     ||
     run print_position position
+    ||
+    run advice position
     (* || *)
     (* loop *)
     (*   for i = 1 to 100_000 do pause done; *)
