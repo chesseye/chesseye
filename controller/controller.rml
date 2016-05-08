@@ -90,11 +90,15 @@ let process advice pos_input =
   end
 
 
-let process check_init mask_input r =
+let process check_init pos_input mask_input r =
   let init_mask = mask_of_position Ochess.init_position in
   loop
     await mask_input(Some m) in
-    if (last ?pos_input).number = Ochess.init_position.number && m = init_mask then emit r
+    begin match last ?pos_input with
+    | Some p ->
+        if p.number = Ochess.init_position.number && m = init_mask then emit r
+    | None -> ()
+    end
   end
 
 
@@ -117,7 +121,7 @@ let process main =
     ||
     run advice position
     ||
-    run check_init mask reset
+    run check_init position mask reset
     (* || *)
     (* loop *)
     (*   for i = 1 to 100_000 do pause done; *)
