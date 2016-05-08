@@ -48,6 +48,9 @@ def pronounce_uci(move):
         return " ".join(move)
 
 if __name__ == "__main__":
+    # Fights the stuttering controller.
+    last_was_rest = False
+
     # Sometimes you make no sense, Python.
     for line in iter(sys.stdin.readline, ""):
         line = line[:-1]
@@ -57,16 +60,27 @@ if __name__ == "__main__":
         verb = line[0:4]
         rest = line[5:]
 
-        if verb == "MOVD":
+        if verb == "MOVD" and not last_was_rest:
             say("Move registered.")
             m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
             if m is not None:
                 say(pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1]))
+
         elif verb == "KIBB":
-            say("I would play: %s" % pronounce_uci(rest))
-        elif verb == "REST":
+            m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
+            if m is not None:
+                move_str = pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1])
+            else:
+                move_str = rest
+            say("I would play: %s" % move_str)
+
+        elif verb == "REST" and not last_was_rest:
             say("The board was reset.")
         elif verb == "ENDG":
             say(rest)
 
+        if verb == "REST":
+            last_was_rest = True
+        else:
+            last_was_rest = False
 
