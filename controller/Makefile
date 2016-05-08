@@ -6,7 +6,7 @@ OCAMLBUILD= ocamlbuild \
 RMLBUILD= rmlbuild \
 		-no-links -classic-display \
 		-libs str \
-		-tags debug,annot
+		-tags debug,annot,thread
 
 TARGET=native
 

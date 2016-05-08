@@ -1,4 +1,35 @@
-let process main =
-  print_endline "The ChessEye controller is running"
+open Types
+open Util
 
+let process position_of_mask mask_input pos_output pos_init =
+  let rec process position_of_mask pos m1 =
+    await mask_input (m2) in
+    let pos' = make_dmove pos (dmove_of_masks m1 m2) in
+    if pos.number <> pos'.number then begin
+      emit pos_output pos';
+      run position_of_mask pos' (mask_of_position pos')
+    end else begin
+      run position_of_mask pos m1
+    end
+  in
+  run position_of_mask pos_init (mask_of_position pos_init)
+
+
+let process print_position pos_input =
+  loop
+    await pos_input(pos) in
+    Ochess.print_position pos
+  end
+
+let process main =
+  print_endline "The ChessEye controller is running";
+  signal mask default Array.make_matrix 8 8 None gather (fun x y -> x) in
+  signal position default Ochess.init_position gather (fun x y -> x) in
+  begin
+    run Rml_async.proc_of_fun Bridge.bridge mask
+    ||
+    run position_of_mask mask position Ochess.init_position
+    ||
+    run print_position position
+  end
 let () = run main
