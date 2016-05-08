@@ -80,7 +80,7 @@ let keep_last x y =
       Some x
   end
 
-let process advice pos_input =
+let process advice_engine pos_input advice_output =
   loop
     await pos_input (Some pos) in
     let smove = run Rml_async.proc_of_fun Ochess.suggest_move pos in
@@ -88,8 +88,7 @@ let process advice pos_input =
     begin match last ?pos_input with
     | Some p ->
         if p.number = pos.number then
-          let msg = Ochess.string_of_move pos smove in
-          print_endline ("MOVE "^msg)
+          emit advice_output (pos, smove)
     | None -> ()
     end
   end
@@ -108,12 +107,29 @@ let process check_init pos_input mask_input r =
     end
   end
 
+let process output_messages position reset advice =
+  loop
+    await position (Some pos) in
+    print_endline "MOVD"
+  end
+  ||
+  loop
+    await reset ( () ) in
+    print_endline "REST"
+  end
+  ||
+  loop
+    await advice (Some (pos, smove)) in
+    let msg = Ochess.string_of_move pos smove in
+    print_endline ("KIBB "^msg)
+  end
 
 let process main =
   print_endline "The ChessEye controller is running";
   signal reset default () gather (fun () () -> ()) in
   signal mask default None gather keep_last in
   signal position default None gather keep_last in
+  signal advice default None gather keep_last in
   begin
     run Rml_async.proc_of_fun Bridge.bridge mask;
     exit 0
@@ -126,7 +142,9 @@ let process main =
     ||
     run print_position position
     ||
-    run advice position
+    run output_messages position reset advice
+    ||
+    run advice_engine position advice
     ||
     run check_init position mask reset
     (* || *)
@@ -137,6 +155,7 @@ let process main =
     (* end *)
     ||
     loop
+      flush stderr;
       flush stdout;
       pause
     end
