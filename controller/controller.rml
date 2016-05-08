@@ -45,24 +45,24 @@ let is_stable_move =
       false
 
 let process position_of_mask mask_input pos_output pos_init =
-  let rec process position_of_mask previous_pos pos m1 =
+  let rec process position_of_mask pos_history pos m1 =
     await mask_input (Some m2) in
     let dmove = dmove_of_masks pos.turn m1 m2 in
-    let pos' = make_dmove previous_pos pos dmove in
+    let (pos', pos_history) = make_dmove pos_history pos dmove in
     if pos.number <> pos'.number then begin
       (* let stable_move = run is_stable_move pos' mask_input in *)
       let stable_move = is_stable_move dmove in
       if stable_move then begin
         emit pos_output pos';
-        run position_of_mask pos pos' (mask_of_position pos')
+        run position_of_mask pos_history pos' (mask_of_position pos')
       end else begin
-      run position_of_mask previous_pos pos m1
+      run position_of_mask pos_history pos m1
       end
     end else begin
-      run position_of_mask previous_pos pos m1
+      run position_of_mask pos_history pos m1
     end
   in
-  run position_of_mask pos_init pos_init (mask_of_position pos_init)
+  run position_of_mask [] pos_init (mask_of_position pos_init)
 
 
 let process print_position pos_input =
