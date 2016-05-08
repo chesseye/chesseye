@@ -547,6 +547,22 @@ let print_move (p:position) = function (* does not check validity *)
         let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
         printf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (char_of_piece_type pt))
 
+let string_of_move (p:position) : (smove -> string) = function (* does not check validity *)
+  | GameOver msg -> msg
+  | SuggestedMove m ->
+      begin
+	match m with
+	| Move(x1, y1, x2, y2) -> 
+            ( match p.ar.(x1).(y1) with 
+            | Piece(pt, _) -> Printf.sprintf "%c%d%c%d" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1)
+            | _ -> raise Illegal_move )
+	| Kingside_castle -> Printf.sprintf "O-O"
+	| Queenside_castle -> Printf.sprintf "O-O-O"
+	| Promotion(pt, x1, x2) -> 
+            let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
+            Printf.sprintf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (char_of_piece_type pt))
+      end
+
 let is_digit c = '0' <= c && c <= '9'
 
 let int_of_char c = int_of_char c - int_of_char '0' - 1
@@ -628,6 +644,19 @@ let parse_level a1 a2 a3 =  (* time control command Xboard calls 'level' *)
     and a2 = parse_time a2
     and a3 = float_of_string a3 in
     if a1 <= 0 then Incremental (a2, a3) else Conventional (a1, a2)
+
+let suggest_move pos =
+  let game_over msg = GameOver msg in
+  match game_status pos with
+  | Draw      -> game_over "1/2-1/2 {Draw}\n"
+  | Win White -> game_over "1-0 {White wins}\n"
+  | Win Black -> game_over "0-1 {Black wins}\n"
+  | Play lm ->
+      assert (lm <> []);
+      let interval = thinking_interval (pos.number / 2)  (Exact 3.0) (30000.0) in
+      (match best_move pos interval with None -> assert false | Some mv -> 
+        (assert (List.mem mv lm);
+         SuggestedMove mv))
 
 let main () = 
    set_signal sigint Signal_ignore; (* xboard sends these *)

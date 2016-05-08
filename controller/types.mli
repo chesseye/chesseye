@@ -30,4 +30,7 @@ type dmove =
   | DKingside_castle
   | DQueenside_castle
   | DError
+type smove =
+  | GameOver of string
+  | SuggestedMove of move
 

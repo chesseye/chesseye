@@ -78,6 +78,10 @@ val parse_move : position -> string -> move option
 type game_status = Win of color | Draw | Play of move list
 val game_status : position -> game_status
 val best_move : position -> float -> move option
+
+val suggest_move : position -> smove
+val string_of_move : position -> smove -> string
+
 type clock =
     Conventional of int * float
   | Incremental of float * float
