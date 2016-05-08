@@ -62,10 +62,11 @@ if __name__ == "__main__":
             m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
             if m is not None:
                 say(pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1]))
-
         elif verb == "KIBB":
             say("I would play: %s" % pronounce_uci(rest))
         elif verb == "REST":
             say("The board was reset.")
+        elif verb == "ENDG":
+            say(rest)
 
 
