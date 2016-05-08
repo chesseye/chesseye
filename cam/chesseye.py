@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import time
 import json
+import os
 
 # All image transformations.
 import pipeline
@@ -14,11 +15,20 @@ def now():
     return millis
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
+    ui = True
+    src = "0"
+
+    for arg in sys.argv[1:]:
+        if arg.startswith("--src="):
+            src = arg[len("--src="):]
+        elif arg == "--no-ui":
+            ui = False
+
+    if os.path.isfile(src):
         # We read from a pre-recorded video
-        cap = cv2.VideoCapture(sys.argv[1])
+        cap = cv2.VideoCapture(src)
     else:
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(int(src))
 
     # The homography
     H = None
@@ -31,7 +41,8 @@ if __name__ == "__main__":
         if not ret or cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-        cv2.imshow("frame", frame)
+        if ui:
+            cv2.imshow("frame", frame)
 
         if H is None:
             new_h = homography.find_homography(frame)
@@ -41,6 +52,7 @@ if __name__ == "__main__":
 
         if H is None:
             # We can't do anything until we have a lock on the board
+            print "NOCB"
             continue
 
         # Reprojecting to get a nice square
@@ -65,8 +77,10 @@ if __name__ == "__main__":
         if pieces.sanity_check(masks):
             pieces.draw_pieces(feedback, masks)
 
-        cv2.imshow("feedback", feedback)
+        if ui:
+            cv2.imshow("feedback", feedback)
         # END OF WHILE LOOP
 
     cap.release()
-    cv2.destroyAllWindows()  
+    if ui:
+        cv2.destroyAllWindows()  
