@@ -690,6 +690,16 @@ let string_of_castling pos =
   end;
   if !acc = "" then "-" else !acc
 
+let string_of_enpassant pos =
+  match pos.en_passant with
+  | None -> "-"
+  | Some col ->
+      begin
+	match pos.turn with
+	| White -> Printf.sprintf "%c6" (letter_of_int col)
+	| Black -> Printf.sprintf "%c3" (letter_of_int col)
+      end
+    
 let edwards_of_position pos =
   let acc = ref "" in
   let empties = ref 0 in
@@ -733,7 +743,7 @@ let edwards_of_position pos =
   begin
     acc := !acc ^ (string_of_turn pos.turn) ^ " ";
     acc := !acc ^ (string_of_castling pos) ^ " ";
-    acc := !acc ^ "-" ^ " ";
+    acc := !acc ^ (string_of_enpassant pos) ^ " ";
     acc := !acc ^ "0" ^ " ";
     acc := !acc ^ (string_of_int pos.number)
   end;
