@@ -4,7 +4,7 @@
 
   * Python with OpenCV (tested with 3.1.0)
   * OCaml
-  * Reactive ML (`opam install rml`)
+  * [ReactiveML](http://reactiveml.org) (`opam install rml`)
 
 ## Compile
 
