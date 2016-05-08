@@ -1,8 +1,8 @@
 open Types
 open Util
 
-let nb_repetition = 1
-let validation_timeout = 0.5
+(* let nb_repetition = 1 *)
+(* let validation_timeout = 0.5 *)
 
 (* let process is_stable_move pos mask_input = *)
 (*   signal stop default false gather (or) in *)
@@ -26,6 +26,12 @@ let validation_timeout = 0.5
 (*     assert false *)
 (*   until stop(b) -> b done *)
 
+let nb_repetition dmov =
+  begin match dmov with
+  | DUndo -> 3
+  | _ -> 1
+  end
+
 let is_stable_move =
   let map = ref Dmov_map.empty in
   fun dmov ->
@@ -33,7 +39,7 @@ let is_stable_move =
       let history = Dmov_map.find dmov !map in
       let now = Unix.gettimeofday () in
       let stable =
-        if List.length history >= 1 then
+        if List.length history >= (nb_repetition dmov) then
           true
         else
           List.exists (fun t -> now -. t > 1.) history
