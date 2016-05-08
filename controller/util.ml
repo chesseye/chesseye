@@ -192,9 +192,15 @@ let dmove_of_masks (m1:mask) (m2:mask): dmove =
       DError
   end
 
+let make_legal_move pos move =
+  if List.mem move (Ochess.legal_moves pos) then
+    (Ochess.make_move pos move 0)
+  else
+    (print_endline "Error in detected move"; pos)
+
 let detect_promotion pos (i1,i2,i3,i4) =
   (* To be done *)
-  Ochess.make_move pos (Move (i1,i2,i3,i4)) 0
+  make_legal_move pos (Move (i1,i2,i3,i4))
 
 let make_dmove pos dmove =
   match dmove with
@@ -202,11 +208,11 @@ let make_dmove pos dmove =
   | DMove (i1,i2,i3,i4) ->
       detect_promotion pos (i1,i2,i3,i4)
   | DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
-      Ochess.make_move pos (Move (i1,i2,i3,i4)) 0
+      make_legal_move pos (Move (i1,i2,i3,i4))
   | DQueenside_castle ->
-      Ochess.make_move pos Queenside_castle 0
+      make_legal_move pos Queenside_castle
   | DKingside_castle ->
-      Ochess.make_move pos Kingside_castle 0
+      make_legal_move pos Kingside_castle
   | DError -> print_endline "Error in detected move"; pos
 
 let mask_of_position pos =
