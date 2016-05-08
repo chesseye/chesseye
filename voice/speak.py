@@ -63,9 +63,9 @@ if __name__ == "__main__":
 
             if verb == "MOVD" and not last_was_rest:
                 say("Move registered.")
-                m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
-                if m is not None:
-                    say(pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1]))
+                # m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
+                # if m is not None:
+                #     say(pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1]))
 
             elif verb == "KIBB":
                 m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
