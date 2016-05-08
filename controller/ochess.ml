@@ -723,7 +723,14 @@ let edwards_of_position pos =
 
 let print_edwards pos =
   printf "\n[Edwards][%s]\n" (edwards_of_position pos)
-    
+
+let full_suggestion pos =
+  let ed = edwards_of_position pos in
+  "\"" ^ ed ^ "\" \"" ^ (string_of_move pos (suggest_move pos)) ^ "\""
+
+let print_full_suggestion pos =
+  printf "\n[Suggestion]%s\n" (full_suggestion pos)
+
 let main () = 
    set_signal sigint Signal_ignore; (* xboard sends these *)
    printf " Ctrl-C is bound to \"move now!\". Use Ctrl-D to quit\n";

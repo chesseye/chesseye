@@ -83,6 +83,8 @@ val suggest_move : position -> smove
 val string_of_move : position -> smove -> string
 val edwards_of_position : position -> string
 val print_edwards : position -> unit
+val full_suggestion : position -> string
+val print_full_suggestion : position -> unit
     
 type clock =
     Conventional of int * float
