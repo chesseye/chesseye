@@ -2,7 +2,8 @@ open Util
 let bridge s =
   try
     while true do
-      let m = mask_of_string (input_line stdin) in
+      let line = input_line stdin in
+      let m = mask_of_string line in
       Rml_async.safe_emit s m
     done
   with

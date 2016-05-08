@@ -16,3 +16,4 @@ val detect_promotion :
   position -> int * int * int * int -> position
 val make_dmove : position -> dmove -> position
 val mask_of_position : position -> mask
+val print_mask : mask -> unit

@@ -1,8 +1,23 @@
 open Types
 
+let print_mask m =
+    let separator = "\n   +----+----+----+----+----+----+----+----+\n" in
+    print_string separator;
+    for j = 7 downto 0 do
+        Printf.printf " %d |" (j + 1);
+        for i = 0 to 7 do
+            match m.(i).(j) with
+            | Some White -> print_string "  W |"
+            | Some Black -> print_string "  B |"
+            | None -> print_string "    |"
+        done;
+        print_string separator;
+    done;
+    print_string "\n      a    b    c    d    e    f    g    h\n"
+
 let warning s =
   Printf.eprintf "%s" s
-  
+
 let string_of_field color f =
   match f with
   | Empty -> "0"
@@ -50,7 +65,7 @@ let mask_of_string s : mask =
         | _ -> failwith "mask_of_string: illegal"
         end
       in
-      board.(i).(j) <- f;
+      if board.(i).(j) = None then board.(i).(j) <- f;
       incr cpt
     done
   done;
@@ -100,8 +115,8 @@ let chose_castle_side (c1,c2,c3,c4) =
     DError
 
 (* Main move detection *)
-let dmove_of_masks (mask1:mask) (mask2:mask): dmove =
-  begin match diff_mask mask1 mask2 with
+let dmove_of_masks (m1:mask) (m2:mask): dmove =
+  begin match diff_mask m1 m2 with
   | [] -> DNoMove
   | [ _ ] -> DError
   | [ ((i1,j1), Some color1, None);
@@ -113,8 +128,8 @@ let dmove_of_masks (mask1:mask) (mask2:mask): dmove =
       else
         DError
   | [ ((i1,j1), Some color1, None);
-      ((i2,j2), Some color1', Some color2); ]
-  | [ ((i2,j2), Some color1', Some color2);
+      ((i2,j2), Some color2, Some color1'); ]
+  | [ ((i2,j2), Some color2, Some color1');
       ((i1,j1), Some color1, None) ] ->
       if color1 = color1' && color1 <> color2 then
         DMove (i1, j1, i2, j2)
@@ -149,7 +164,7 @@ let dmove_of_masks (mask1:mask) (mask2:mask): dmove =
       ((c4, l4), None, Some color4); ]
   | [ ((c1, l1), Some color1, None);
       ((c3, l3), None, Some color3);
-      ((c4, l4), None, Some color4); 
+      ((c4, l4), None, Some color4);
       ((c2, l2), Some color2, None); ]
   | [ ((c3, l3), None, Some color3);
       ((c1, l1), Some color1, None);
@@ -157,25 +172,30 @@ let dmove_of_masks (mask1:mask) (mask2:mask): dmove =
       ((c4, l4), None, Some color4); ]
   | [ ((c3, l3), None, Some color3);
       ((c1, l1), Some color1, None);
-      ((c4, l4), None, Some color4); 
+      ((c4, l4), None, Some color4);
       ((c2, l2), Some color2, None); ]
   | [ ((c3, l3), None, Some color3);
-      ((c4, l4), None, Some color4); 
+      ((c4, l4), None, Some color4);
       ((c1, l1), Some color1, None);
       ((c2, l2), Some color2, None); ] ->
 	if (consistent_line_and_color (l1,l2,l3,l4) (color1,color2,color3,color4))
 	then
-	  chose_castle_side (c1,c2,c3,c4) 
+	  chose_castle_side (c1,c2,c3,c4)
 	else
 	  DError
-(*| [ _ ; _ ] -> DError
-  | [ _ ; _ ; _ ] -> DError *)
+  | diff ->
+      warning "XXXXXXXXXXX ERROR: dmove_of_masks";
+      (* print_int (List.length diff); *)
+      (* print_newline (); *)
+      (* print_mask m1; *)
+      (* print_mask m2; *)
+      DError
   end
 
 let detect_promotion pos (i1,i2,i3,i4) =
   (* To be done *)
   Ochess.make_move pos (Types.Move (i1,i2,i3,i4)) 0
-    
+
 let make_dmove pos dmove =
   match dmove with
   | Types.DNoMove -> pos
@@ -188,7 +208,7 @@ let make_dmove pos dmove =
   | Types.DKingside_castle ->
       Ochess.make_move pos Types.Kingside_castle 0
   | Types.DError -> print_endline "Error in detected move"; pos
-    
+
 let mask_of_position pos =
   (mask_of_string (string_of_position pos))
 
