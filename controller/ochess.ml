@@ -751,9 +751,12 @@ let edwards_of_position pos =
 let print_edwards pos =
   printf "\n[Edwards][%s]\n" (edwards_of_position pos)
 
-let full_suggestion pos =
+let long_string_of_smove pos smove =
   let ed = edwards_of_position pos in
-  "\"" ^ ed ^ "\" \"" ^ (string_of_smove pos (suggest_move pos)) ^ "\""
+  "\"" ^ ed ^ "\" \"" ^ (string_of_smove pos smove) ^ "\""
+								       
+let full_suggestion pos =
+  long_string_of_smove pos (suggest_move pos)
 
 let print_full_suggestion pos =
   printf "%s\n" (full_suggestion pos)

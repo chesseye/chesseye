@@ -82,6 +82,7 @@ val best_move : position -> float -> move option
 val suggest_move : position -> smove
 val string_of_move : position -> move -> string
 val string_of_smove : position -> smove -> string
+val long_string_of_smove : position -> smove -> string
 val edwards_of_position : position -> string
 val print_edwards : position -> unit
 val full_suggestion : position -> string
