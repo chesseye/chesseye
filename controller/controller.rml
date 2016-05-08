@@ -94,14 +94,15 @@ let process advice_engine pos_input advice_output =
   end
 
 
-let process check_init pos_input mask_input r =
+let process check_init pos_inout mask_input r =
   let init_mask = mask_of_position Ochess.init_position in
   loop
     await mask_input(Some m) in
-    begin match last ?pos_input with
+    begin match last ?pos_inout with
     | Some p ->
         if p.number <> Ochess.init_position.number && m = init_mask then
           (print_endline "REST";
+           emit pos_inout Ochess.init_position;
            emit r)
     | None -> ()
     end
