@@ -29,6 +29,7 @@ type dmove =
   | DEnPassant of color * (int * int * int * int) * (int * int)
   | DKingside_castle
   | DQueenside_castle
+  | DUndo
   | DError
 type smove =
   | GameOver of string

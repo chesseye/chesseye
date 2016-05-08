@@ -11,10 +11,10 @@ val consistent_line_and_color :
   int * int * int * int ->
   color * color * color * color -> bool
 val chose_castle_side : int * int * int * int -> dmove
-val dmove_of_masks : mask -> mask -> dmove
+val dmove_of_masks : color -> mask -> mask -> dmove
 val detect_promotion :
   position -> int * int * int * int -> position
-val make_dmove : position -> dmove -> position
+val make_dmove : position -> position -> dmove -> position
 val mask_of_position : position -> mask
 val print_mask : mask -> unit
 val parse_message : string -> mask option

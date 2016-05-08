@@ -115,7 +115,7 @@ let chose_castle_side (c1,c2,c3,c4) =
     DError
 
 (* Main move detection *)
-let dmove_of_masks (m1:mask) (m2:mask): dmove =
+let dmove_of_masks (turn:color) (m1:mask) (m2:mask): dmove =
   begin match diff_mask m1 m2 with
   | [] -> DNoMove
   | [ _ ] -> DError
@@ -124,7 +124,8 @@ let dmove_of_masks (m1:mask) (m2:mask): dmove =
   | [ ((i2,j2), None, Some color1');
       ((i1,j1), Some color1, None); ] ->
       if color1 = color1' then
-        DMove (i1, j1, i2, j2)
+        if turn = color1 then DMove (i1, j1, i2, j2)
+        else DUndo
       else
         DError
   | [ ((i1,j1), Some color1, None);
@@ -133,6 +134,14 @@ let dmove_of_masks (m1:mask) (m2:mask): dmove =
       ((i1,j1), Some color1, None) ] ->
       if color1 = color1' && color1 <> color2 then
         DMove (i1, j1, i2, j2)
+      else
+        DError
+  | [ ((i1,j1), None, Some color1);
+      ((i2,j2), Some color1', Some color2); ]
+  | [ ((i2,j2), Some color1', Some color2);
+      ((i1,j1), None, Some color1); ] ->
+      if color1 = color1' && color1 <> color2 then
+        DUndo
       else
         DError
   | [ ((i1, j1), Some color1, None);
@@ -202,7 +211,7 @@ let detect_promotion pos (i1,i2,i3,i4) =
   (* To be done *)
   make_legal_move pos (Move (i1,i2,i3,i4))
 
-let make_dmove pos dmove =
+let make_dmove previous_pos pos dmove =
   match dmove with
   | DNoMove -> pos
   | DMove (i1,i2,i3,i4) ->
@@ -213,7 +222,8 @@ let make_dmove pos dmove =
       make_legal_move pos Queenside_castle
   | DKingside_castle ->
       make_legal_move pos Kingside_castle
-  | DError -> print_endline "Error in detected move"; pos
+  | DUndo -> previous_pos
+  | DError -> pos
 
 let mask_of_position pos =
   (mask_of_string (string_of_position pos))
