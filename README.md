@@ -1,3 +1,8 @@
 # Readme
 
-When you have some time!
+## Prerequisites
+
+  * Python with OpenCV (tested with 3.1.0)
+  * OCaml
+  * Reactive ML (`opam install rml`)
+
