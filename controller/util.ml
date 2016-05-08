@@ -196,7 +196,7 @@ let make_legal_move pos move =
   if List.mem move (Ochess.legal_moves pos) then
     (Ochess.make_move pos move 0)
   else
-    (print_endline "Error in detected move"; pos)
+    (pos)
 
 let detect_promotion pos (i1,i2,i3,i4) =
   (* To be done *)
