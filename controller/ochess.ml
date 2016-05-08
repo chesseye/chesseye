@@ -659,6 +659,71 @@ let suggest_move pos =
       (*   (assert (List.mem mv lm); *)
       (*    SuggestedMove mv)) *)
 
+let string_of_white_piece p =
+  match p with
+  | King -> "K" | Queen -> "Q" | Rook -> "R" | Bishop -> "B" | Knight -> "N" | Pawn -> "P"
+	
+let string_of_black_piece p =
+  match p with
+  | King -> "k" | Queen -> "q" | Rook -> "r" | Bishop -> "b" | Knight -> "n" | Pawn -> "p"
+
+let string_of_turn turn =
+  match turn with
+  | White -> "w"
+  | Black -> "b"
+	
+let edwards_of_position pos =
+  let acc = ref "" in
+  let empties = ref 0 in
+  for j = 7 downto 0 do
+    for i = 0 to 7 do
+      match pos.ar.(i).(j) with
+      | Empty -> incr empties
+      | Piece (pt,White) ->
+	  begin
+	    if !empties = 0
+	    then
+	      acc := !acc ^ (string_of_white_piece pt)
+	    else
+	      begin
+		acc := !acc ^ (string_of_int !empties) ^ (string_of_white_piece pt);
+		empties := 0;
+	      end
+	  end
+      | Piece (pt,Black) ->
+	  begin
+	    if !empties = 0
+	    then
+	      acc := !acc ^ (string_of_black_piece pt)
+	    else
+	      begin
+		acc := !acc ^ (string_of_int !empties) ^ (string_of_black_piece pt);
+		empties := 0
+	      end
+	  end
+    done;
+    let trans = if j = 0 then " " else "/" in
+    if !empties = 0
+    then
+      acc := !acc ^ trans
+    else
+      begin
+	acc := !acc ^ (string_of_int !empties) ^ trans;
+	empties := 0
+      end
+  done;
+  begin
+    acc := !acc ^ (string_of_turn pos.turn) ^ " ";
+    acc := !acc ^ "KQkq" ^ " ";
+    acc := !acc ^ "-" ^ " ";
+    acc := !acc ^ "0" ^ " ";
+    acc := !acc ^ (string_of_int pos.number)
+  end;
+  !acc
+
+let print_edwards pos =
+  printf "\n[Edwards][%s]\n" (edwards_of_position pos)
+    
 let main () = 
    set_signal sigint Signal_ignore; (* xboard sends these *)
    printf " Ctrl-C is bound to \"move now!\". Use Ctrl-D to quit\n";

@@ -18,6 +18,7 @@ let process position_of_mask mask_input pos_output pos_init =
 let process print_position pos_input =
   loop
     await pos_input(Some pos) in
+    (* Ochess.print_edwards pos; *)
     Ochess.print_position pos
   end
 
