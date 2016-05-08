@@ -193,11 +193,6 @@ let dmove_of_masks (turn:color) (m1:mask) (m2:mask): dmove =
 	else
 	  DError
   | diff ->
-      (* warning "XXXXXXXXXXX ERROR: dmove_of_masks"; *)
-      (* print_int (List.length diff); *)
-      (* print_newline (); *)
-      (* print_mask m1; *)
-      (* print_mask m2; *)
       DError
   end
 

@@ -1,31 +1,6 @@
 open Types
 open Util
 
-(* let nb_repetition = 1 *)
-(* let validation_timeout = 0.5 *)
-
-(* let process is_stable_move pos mask_input = *)
-(*   signal stop default false gather (or) in *)
-(*   let m1 = mask_of_position pos in *)
-(*   let cpt = ref 0 in *)
-(*   do *)
-(*     begin *)
-(*       while (!cpt < nb_repetition) do *)
-(*         await mask_input (Some m2) in *)
-(*         if m1 = m2 then incr cpt; *)
-(*       done; *)
-(*       emit stop true *)
-(*       || *)
-(*       let start = Unix.gettimeofday () in *)
-(*       loop *)
-(*         for i = 1 to 10 do pause done; *)
-(*         let now = Unix.gettimeofday () in *)
-(*         if now -. start > 1.0 then emit stop false *)
-(*       end *)
-(*     end; *)
-(*     assert false *)
-(*   until stop(b) -> b done *)
-
 let nb_repetition dmov =
   begin match dmov with
   | DUndo -> 3
@@ -56,7 +31,6 @@ let process position_of_mask mask_input pos_output pos_init =
     let dmove = dmove_of_masks pos.turn m1 m2 in
     let (pos', pos_history) = make_dmove pos_history pos dmove in
     if pos.number <> pos'.number then begin
-      (* let stable_move = run is_stable_move pos' mask_input in *)
       let stable_move = is_stable_move dmove in
       if stable_move then begin
         emit pos_output pos';
@@ -91,7 +65,6 @@ let process advice_engine pos_input advice_output =
     await pos_input (Some pos) in
     if List.mem pos.turn Config.advices then
       let smove = run Rml_async.proc_of_fun Ochess.suggest_move pos in
-      (* let smove = Ochess.suggest_move pos in *)
       begin match last ?pos_input with
       | Some p ->
           if p.number = pos.number then
@@ -160,12 +133,6 @@ let process main =
     run advice_engine position advice
     ||
     run check_init position mask reset
-    (* || *)
-    (* loop *)
-    (*   for i = 1 to 100_000 do pause done; *)
-    (*   print_endline "tick"; *)
-    (*   pause *)
-    (* end *)
     ||
     loop
       flush stderr;
