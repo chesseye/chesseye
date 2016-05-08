@@ -744,7 +744,7 @@ let edwards_of_position pos =
     acc := !acc ^ (string_of_turn pos.turn) ^ " ";
     acc := !acc ^ (string_of_castling pos) ^ " ";
     acc := !acc ^ (string_of_enpassant pos) ^ " ";
-    acc := !acc ^ "0" ^ " ";
+    acc := !acc ^ (string_of_int pos.irr_change) ^ " ";
     acc := !acc ^ (string_of_int pos.number)
   end;
   !acc
