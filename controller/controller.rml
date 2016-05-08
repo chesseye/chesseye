@@ -89,19 +89,35 @@ let process advice pos_input =
     print_endline ("MOVE "^msg)
   end
 
+
+let process check_init mask_input r =
+  let init_mask = mask_of_position Ochess.init_position in
+  loop
+    await mask_input(Some m) in
+    if (last ?pos_input).number = Ochess.init_position.number && m = init_mask then emit r
+  end
+
+
 let process main =
   print_endline "The ChessEye controller is running";
+  signal reset default () gather (fun () () -> ()) in
   signal mask default None gather keep_last in
   signal position default None gather keep_last in
   begin
     run Rml_async.proc_of_fun Bridge.bridge mask;
     exit 0
     ||
-    run position_of_mask mask position Ochess.init_position
+    loop
+      do
+        run position_of_mask mask position Ochess.init_position
+      until reset done
+    end
     ||
     run print_position position
     ||
     run advice position
+    ||
+    run check_init mask reset
     (* || *)
     (* loop *)
     (*   for i = 1 to 100_000 do pause done; *)
