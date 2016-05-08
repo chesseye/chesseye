@@ -133,7 +133,7 @@ let process output_messages position reset advice =
   ||
   loop
     await advice (Some (pos, smove)) in
-    let msg = Ochess.string_of_move pos smove in
+    let msg = Ochess.string_of_smove pos smove in
     print_endline ("KIBB "^msg)
   end
 

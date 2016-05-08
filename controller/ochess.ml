@@ -547,21 +547,20 @@ let print_move (p:position) = function (* does not check validity *)
         let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
         printf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (char_of_piece_type pt))
 
-let string_of_move (p:position) : (smove -> string) = function (* does not check validity *)
+let string_of_move (p:position) : (move -> string) = function (* does not check validity *)
+  | Move(x1, y1, x2, y2) -> 
+      ( match p.ar.(x1).(y1) with 
+      | Piece(pt, _) -> Printf.sprintf "%c%d%c%d" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1)
+      | _ -> raise Illegal_move )
+  | Kingside_castle -> Printf.sprintf "O-O"
+  | Queenside_castle -> Printf.sprintf "O-O-O"
+  | Promotion(pt, x1, x2) -> 
+      let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
+      Printf.sprintf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (char_of_piece_type pt))
+
+let string_of_smove (p:position) : (smove -> string) = function (* does not check validity *)
   | GameOver msg -> msg
-  | SuggestedMove m ->
-      begin
-	match m with
-	| Move(x1, y1, x2, y2) -> 
-            ( match p.ar.(x1).(y1) with 
-            | Piece(pt, _) -> Printf.sprintf "%c%d%c%d" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1)
-            | _ -> raise Illegal_move )
-	| Kingside_castle -> Printf.sprintf "O-O"
-	| Queenside_castle -> Printf.sprintf "O-O-O"
-	| Promotion(pt, x1, x2) -> 
-            let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
-            Printf.sprintf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (char_of_piece_type pt))
-      end
+  | SuggestedMove m -> string_of_move p m
 
 let is_digit c = '0' <= c && c <= '9'
 
@@ -754,7 +753,7 @@ let print_edwards pos =
 
 let full_suggestion pos =
   let ed = edwards_of_position pos in
-  "\"" ^ ed ^ "\" \"" ^ (string_of_move pos (suggest_move pos)) ^ "\""
+  "\"" ^ ed ^ "\" \"" ^ (string_of_smove pos (suggest_move pos)) ^ "\""
 
 let print_full_suggestion pos =
   printf "%s\n" (full_suggestion pos)
