@@ -31,8 +31,10 @@ if __name__ == "__main__":
 
     verb = sys.argv[1]
 
-    if verb == "MOVE":
-        say_move(sys.argv[2])
+    if verb == "MOVD":
+        say("Move registered.")
+    elif verb == "KIBB":
+        say("I would play: %s" % sys.argv[2])
     elif verb == "FENM":
         say_fen_move(sys.argv[2], sys.argv[3])
     else:
