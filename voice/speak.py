@@ -1,3 +1,4 @@
+import os
 import chess
 import sys
 import subprocess
@@ -6,8 +7,11 @@ import watson
 
 def say(text):
     if watson.load_credentials() != None:
+        if not os.environ["WAV_PLAYER"]:
+            sys.stderr.write("You need to define the environment variable WAV_PLAYER.\n")
+            sys.exit(1)
         wav_file = watson.get_file(text)
-        print wav_file
+        subprocess.call([ os.environ["WAV_PLAYER"], wav_file ])
     else:
         subprocess.call([ "say", text ])
 
@@ -20,6 +24,7 @@ def say_move(move_str):
     say(move_str)
 
 if __name__ == "__main__":
+
     if len(sys.argv) < 2:
         sys.stderr.write("Expected command.\n")
         sys.exit(1)
