@@ -32,6 +32,7 @@ let keep_last x y =
 let process advice pos_input =
   loop
     await pos_input (Some pos) in
+    (* let smove = run Rml_async.proc_of_fun Ochess.suggest_move pos in *)
     let smove = Ochess.suggest_move pos in
     let msg = Ochess.string_of_move pos smove in
     print_endline ("MOVE "^msg)

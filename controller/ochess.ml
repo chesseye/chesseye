@@ -655,7 +655,7 @@ let suggest_move pos =
       SuggestedMove (List.hd lm)
       (* assert (lm <> []); *)
       (* let interval = thinking_interval (pos.number / 2)  (Exact 3.0) (30000.0) in *)
-      (* (match best_move pos interval with None -> assert false | Some mv ->  *)
+      (* (match best_move pos interval with None -> assert false | Some mv -> *)
       (*   (assert (List.mem mv lm); *)
       (*    SuggestedMove mv)) *)
 
