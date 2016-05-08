@@ -96,7 +96,7 @@ let process check_init pos_input mask_input r =
     await mask_input(Some m) in
     begin match last ?pos_input with
     | Some p ->
-        if p.number = Ochess.init_position.number && m = init_mask then emit r
+        if p.number <> Ochess.init_position.number && m = init_mask then emit r
     | None -> ()
     end
   end
