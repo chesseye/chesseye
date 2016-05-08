@@ -2,6 +2,7 @@ import os
 import chess
 import sys
 import subprocess
+import re
 
 import watson
 
@@ -15,13 +16,36 @@ def say(text):
     else:
         subprocess.call([ "say", text ])
 
-def say_fen_move(fen_str, uci_str):
+def pronounce_move(fen_str, uci_str):
     board = chess.Board(fen_str)
     move = board.parse_uci(uci_str)
-    say(board.san(move))
 
-def say_move(move_str):
-    say(move_str)
+    san = board.san(move)
+
+    if move == "O-O" or move == "o-o" or move == "0-0":
+        return "king-side castle"
+    elif move == "O-O-O" or move == "o-o-o" or move == "0-0-0":
+        return "queen-side castle"
+    
+    s = " ".join(san)
+
+    s = s.replace("K", "king")
+    s = s.replace("Q", "queen")
+    s = s.replace("R", "rook")
+    s = s.replace("B", "bishop")
+    s = s.replace("N", "knight")
+    s = s.replace("x", "takes")
+    s = s.replace("+", "check!")
+
+    return s
+
+def pronounce_uci(move):
+    if move == "O-O" or move == "o-o" or move == "0-0":
+        return "king-side castle"
+    elif move == "O-O-O" or move == "o-o-o" or move == "0-0-0":
+        return "queen-side castle"
+    else:
+        return " ".join(move)
 
 if __name__ == "__main__":
     # Sometimes you make no sense, Python.
@@ -35,8 +59,12 @@ if __name__ == "__main__":
 
         if verb == "MOVD":
             say("Move registered.")
+            m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
+            if m is not None:
+                say(pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1]))
+
         elif verb == "KIBB":
-            say("I would play: %s" % rest)
+            say("I would play: %s" % pronounce_uci(rest))
         elif verb == "REST":
             say("The board was reset.")
 
