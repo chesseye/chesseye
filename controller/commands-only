@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+while read line
+do
+    echo "$line" | grep "^[A-Z][A-Z][A-Z][A-Z]"
+done < "${1:-/dev/stdin}"
