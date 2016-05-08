@@ -24,24 +24,20 @@ def say_move(move_str):
     say(move_str)
 
 if __name__ == "__main__":
+    # Sometimes you make no sense, Python.
+    for line in iter(sys.stdin.readline, ""):
+        line = line[:-1]
 
-    if len(sys.argv) < 2:
-        sys.stderr.write("Expected command.\n")
-        sys.exit(1)
+        print "%s" % line
 
-    full_string = " ".join(sys.argv[1:])
+        verb = line[0:4]
+        rest = line[5:]
 
-    print "[%s]" % full_string
-
-    verb = full_string[0:4]
-
-    if verb == "MOVD":
-        say("Move registered.")
-    elif verb == "KIBB":
-        say("I would play: %s" % sys.argv[2])
-    elif verb == "REST":
-        say("The board was reset.")
-    elif verb == "FENM":
-        say_fen_move(sys.argv[2], sys.argv[3])
+        if verb == "MOVD":
+            say("Move registered.")
+        elif verb == "KIBB":
+            say("I would play: %s" % rest)
+        elif verb == "REST":
+            say("The board was reset.")
 
 
