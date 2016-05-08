@@ -2,7 +2,12 @@ import chess
 import sys
 import subprocess
 
+import watson
+
 def say(text):
+    if watson.load_credentials() != None:
+        print "I haz watson"
+
     subprocess.call([ "say", text ])
 
 def say_fen_move(fen_str, uci_str):
