@@ -45,10 +45,11 @@ def avg_center(bw):
 # The positions are enumerated by A-file first, 1st to 8th rank, so:
 # a1, a2, a3... a8, b1, ... b8, c1, ... h8
 def find_pieces(img):
-    debug = True
+    debug = False
 
     contours = apply_per_square_and_recombine(img, pipeline.get_contours)
-    cv2.imshow("contours", contours)
+    if debug:
+        cv2.imshow("contours", contours)
 
     piece_mask = apply_per_square(contours, lambda x: count_white(x) > 20)
     average_centers = apply_per_square(img, avg_center)
@@ -89,3 +90,18 @@ def masks_to_string(masks):
     stringify = lambda l: "".join(map(lambda p: "1" if p else "0", l))
 
     return stringify(masks["white"]) + stringify(masks["black"])
+
+# Img should be 800x800 and color
+def draw_pieces(img, masks):
+    for i in xrange(0,8):
+        for j in xrange(0,8):
+            c = 8*i + j
+
+            x = 700 - (100*j)
+            y = 700 - (100*i)
+
+            if masks["white"][c]:
+                cv2.rectangle(img, (x+10,y+10), (x+90,y+90), (255,0,0), 2)
+            elif masks["black"][c]:
+                cv2.rectangle(img, (x+10,y+10), (x+90,y+90), (0,0,255), 2)
+            

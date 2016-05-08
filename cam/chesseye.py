@@ -50,7 +50,6 @@ if __name__ == "__main__":
         # Some lame attempt at sharpening.
         blurred = cv2.GaussianBlur(bw_reproj, (0,0), 3)
         sharp = cv2.addWeighted(bw_reproj, 1.5, blurred, -0.5, 0)
-        cv2.imshow("sharp", sharp)
 
         masks = pieces.find_pieces(sharp)
 
@@ -59,6 +58,12 @@ if __name__ == "__main__":
         else:
             print "OBST"
 
+        feedback = pipeline.to_color(sharp)
+
+        if pieces.sanity_check(masks):
+            pieces.draw_pieces(feedback, masks)
+
+        cv2.imshow("feedback", feedback)
         # END OF WHILE LOOP
 
     cap.release()

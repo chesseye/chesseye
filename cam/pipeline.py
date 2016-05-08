@@ -5,6 +5,10 @@ import numpy as np
 def to_gray(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+# Converts to a color image
+def to_color(img):
+    return cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
 # Img should be BW
 def get_corners(img, how_many, min_dist):
     ftt = cv2.goodFeaturesToTrack(img, how_many, 0.05, min_dist)

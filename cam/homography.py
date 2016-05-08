@@ -5,7 +5,7 @@ import pipeline
 
 # Frame should be BW. Returns a homography to project onto a 800x800 image.
 def find_homography(frame):
-    debug = True
+    debug = False
 
     if debug:
         debug_frame = np.copy(frame)
