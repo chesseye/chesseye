@@ -37,6 +37,13 @@ def avg_center(bw):
 
 
 # Expects a 800x800 BW image.
+# Returns a dictionary with two, two-dimensional, boolean arrays:
+# {
+#    "white": [ ... ]
+#    "black": [ ... ]
+# }
+# The positions are enumerated by A-file first, 1st to 8th rank, so:
+# a1, a2, a3... a8, b1, ... b8, c1, ... h8
 def find_pieces(img):
     debug = True
 
@@ -45,16 +52,40 @@ def find_pieces(img):
 
     piece_mask = apply_per_square(contours, lambda x: count_white(x) > 20)
     average_centers = apply_per_square(img, avg_center)
-    
+
+    white_mask = []
+    black_mask = []
     for i in xrange(0,8):
         for j in xrange (0,8):
-            if piece_mask[i][j]:
-                if average_centers[i][j] < 128:
-                    sys.stdout.write("B ")
+            if piece_mask[7-i][7-j]:
+                if average_centers[7-i][7-j] < 128:
+                    white_mask.append(False)
+                    black_mask.append(True)
                 else:
-                    sys.stdout.write("W ")
+                    white_mask.append(True)
+                    black_mask.append(False)
             else:
-                sys.stdout.write(". ")
-        sys.stdout.write("\n")
-    print ""
+                white_mask.append(False)
+                black_mask.append(False)
 
+    return {
+        "white": white_mask,
+        "black": black_mask
+    }
+
+
+# Return False if the masks are obviously not from a valid position (likely to be from
+# camera obstruction)
+def sanity_check(masks):
+    count = lambda l: sum(map(lambda p: 1 if p else 0, l))
+
+    total_white = count(masks["white"])
+    total_black = count(masks["black"])
+
+    # arbitrary criterion for now
+    return total_white < 20 and total_black < 20 and (total_white + total_black < 37)
+
+def masks_to_string(masks):
+    stringify = lambda l: "".join(map(lambda p: "1" if p else "0", l))
+
+    return stringify(masks["white"]) + stringify(masks["black"])

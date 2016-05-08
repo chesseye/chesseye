@@ -2,6 +2,7 @@ import cv2
 import sys
 import numpy as np
 import time
+import json
 
 # All image transformations.
 import pipeline
@@ -11,7 +12,6 @@ import pieces
 def now():
     millis = int(round(time.time() * 1000))
     return millis
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -52,7 +52,12 @@ if __name__ == "__main__":
         sharp = cv2.addWeighted(bw_reproj, 1.5, blurred, -0.5, 0)
         cv2.imshow("sharp", sharp)
 
-        pieces.find_pieces(sharp)
+        masks = pieces.find_pieces(sharp)
+
+        if pieces.sanity_check(masks):
+            print "MASK %s" % pieces.masks_to_string(masks)
+        else:
+            print "OBST"
 
         # END OF WHILE LOOP
 
