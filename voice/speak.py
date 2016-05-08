@@ -29,7 +29,11 @@ if __name__ == "__main__":
         sys.stderr.write("Expected command.\n")
         sys.exit(1)
 
-    verb = sys.argv[1]
+    full_string = " ".join(sys.argv[1:])
+
+    print "[%s]" % full_string
+
+    verb = full_string[0:4]
 
     if verb == "MOVD":
         say("Move registered.")
@@ -37,7 +41,5 @@ if __name__ == "__main__":
         say("I would play: %s" % sys.argv[2])
     elif verb == "FENM":
         say_fen_move(sys.argv[2], sys.argv[3])
-    else:
-        sys.stderr.write("Unrecognized command: '%s'.\n" % verb)
-        sys.exit(1)
+
 
