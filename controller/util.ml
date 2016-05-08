@@ -189,3 +189,6 @@ let make_dmove pos dmove =
       Ochess.make_move pos Types.Kingside_castle 0
   | Types.DError -> print_endline "Error in detected move"; pos
     
+let mask_of_position pos =
+  (mask_of_string (string_of_position pos))
+

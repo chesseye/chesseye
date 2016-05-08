@@ -1,0 +1,10 @@
+let bridge s =
+  try
+    let ic = Unix.in_channel_of_descr stdin in
+    while true do
+      let msg = read_line ic in
+      Rml_async.safe_emit s msg
+    done
+  with
+  | _ ->
+      close_in ic
