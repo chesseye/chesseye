@@ -239,8 +239,7 @@ let mask_of_position pos =
 let parse_message msg =
   begin match String.sub msg 0 4 with
   | "MASK" ->
-      Some (mask_of_string (String.sub msg 5 128))
+      MASK (mask_of_string (String.sub msg 5 128))
   | _ ->
-      warning ("Bad message: "^msg);
-      None
+      OTHER msg
   end

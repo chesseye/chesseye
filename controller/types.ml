@@ -39,3 +39,9 @@ type smove =
   | GameOver of string
   | SuggestedMove of move
 
+
+type input_message =
+  | MASK of mask
+  | OBST (* No visible mask *)
+  | NOCB (* No chess board *)
+  | OTHER of string 

@@ -34,4 +34,9 @@ type dmove =
 type smove =
   | GameOver of string
   | SuggestedMove of move
+type input_message =
+  | MASK of mask
+  | OBST
+  | NOCB
+  | OTHER of string
 
