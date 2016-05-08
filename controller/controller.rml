@@ -3,7 +3,7 @@ open Util
 
 let process position_of_mask mask_input pos_output pos_init =
   let rec process position_of_mask pos m1 =
-    await mask_input (m2) in
+    await mask_input (Some m2) in
     let pos' = make_dmove pos (dmove_of_masks m1 m2) in
     if pos.number <> pos'.number then begin
       emit pos_output pos';
@@ -17,19 +17,39 @@ let process position_of_mask mask_input pos_output pos_init =
 
 let process print_position pos_input =
   loop
-    await pos_input(pos) in
+    await pos_input(Some pos) in
     Ochess.print_position pos
+  end
+
+let keep_last x y =
+  begin match y with
+  | None -> Some x
+  | Some _ ->
+      warning "Drop event";
+      Some x
   end
 
 let process main =
   print_endline "The ChessEye controller is running";
-  signal mask default Array.make_matrix 8 8 None gather (fun x y -> x) in
-  signal position default Ochess.init_position gather (fun x y -> x) in
+  signal mask default None gather keep_last in
+  signal position default None gather keep_last in
   begin
-    run Rml_async.proc_of_fun Bridge.bridge mask
+    run Rml_async.proc_of_fun Bridge.bridge mask;
+    exit 0
     ||
     run position_of_mask mask position Ochess.init_position
     ||
     run print_position position
+    (* || *)
+    (* loop *)
+    (*   for i = 1 to 100_000 do pause done; *)
+    (*   print_endline "tick"; *)
+    (*   pause *)
+    (* end *)
+    ||
+    loop
+      flush stdout;
+      pause
+    end
   end
 let () = run main
