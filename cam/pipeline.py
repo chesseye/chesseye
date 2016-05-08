@@ -73,3 +73,10 @@ def hough_to_two_points(rho, theta):
     y2 = int(y0 - 1000*(a))
     
     return ((x1,y1),(x2,y2))
+
+# Img must be BW
+def get_contours(img):
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    cl = clahe.apply(img)
+    edges = cv2.Canny(cl, 100, 250, apertureSize = 3)
+    return edges
