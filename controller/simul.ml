@@ -58,7 +58,7 @@ let print_positions f bitmaps =
   close_out oc
 
 let emit_position bitmap =
-  let nb_emit = Random.int 100 in
+  let nb_emit = 5 + Random.int 100 in
   for i = 0 to nb_emit do
     Thread.delay 0.01;
     print_endline bitmap

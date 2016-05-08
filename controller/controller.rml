@@ -1,13 +1,63 @@
 open Types
 open Util
 
+let nb_repetition = 1
+let validation_timeout = 0.5
+
+(* let process is_stable_move pos mask_input = *)
+(*   signal stop default false gather (or) in *)
+(*   let m1 = mask_of_position pos in *)
+(*   let cpt = ref 0 in *)
+(*   do *)
+(*     begin *)
+(*       while (!cpt < nb_repetition) do *)
+(*         await mask_input (Some m2) in *)
+(*         if m1 = m2 then incr cpt; *)
+(*       done; *)
+(*       emit stop true *)
+(*       || *)
+(*       let start = Unix.gettimeofday () in *)
+(*       loop *)
+(*         for i = 1 to 10 do pause done; *)
+(*         let now = Unix.gettimeofday () in *)
+(*         if now -. start > 1.0 then emit stop false *)
+(*       end *)
+(*     end; *)
+(*     assert false *)
+(*   until stop(b) -> b done *)
+
+let is_stable_move =
+  let map = ref Dmov_map.empty in
+  fun dmov ->
+    try
+      let history = Dmov_map.find dmov !map in
+      let now = Unix.gettimeofday () in
+      let stable =
+        if List.length history >= 1 then
+          true
+        else
+          List.exists (fun t -> now -. t > 1.) history
+      in
+      map := if stable then Dmov_map.empty else Dmov_map.add dmov now !map;
+      stable
+    with Not_found ->
+      map := Dmov_map.add dmov (Unix.gettimeofday ()) !map;
+      false
+
 let process position_of_mask mask_input pos_output pos_init =
   let rec process position_of_mask pos m1 =
     await mask_input (Some m2) in
-    let pos' = make_dmove pos (dmove_of_masks m1 m2) in
+    let dmove = dmove_of_masks m1 m2 in
+    let pos' = make_dmove pos dmove in
     if pos.number <> pos'.number then begin
-      emit pos_output pos';
-      run position_of_mask pos' (mask_of_position pos')
+      (* let stable_move = run is_stable_move pos' mask_input in *)
+      let stable_move = is_stable_move dmove in
+      if stable_move then begin
+        emit pos_output pos';
+        run position_of_mask pos' (mask_of_position pos')
+      end else begin
+      run position_of_mask pos m1
+      end
     end else begin
       run position_of_mask pos m1
     end
