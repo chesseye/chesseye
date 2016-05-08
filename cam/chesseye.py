@@ -55,8 +55,10 @@ if __name__ == "__main__":
 
         if pieces.sanity_check(masks):
             print "MASK %s" % pieces.masks_to_string(masks)
+            sys.stdout.flush()
         else:
             print "OBST"
+            sys.stdout.flush()
 
         feedback = pipeline.to_color(sharp)
 
