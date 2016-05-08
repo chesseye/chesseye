@@ -119,7 +119,11 @@ let process output_messages position reset advice =
   loop
     await position (Some pos) in
     print_string "MOVD ";
-    Ochess.print_full_suggestion pos
+    Ochess.print_full_suggestion pos;
+    match Ochess.game_status pos with
+    | Ochess.Win color -> print_endline "ENDG checkmate"
+    | Ochess.Draw -> "ENDG stalemate"
+    | Ochess.Play _ -> ()
   end
   ||
   loop
