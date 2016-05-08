@@ -25,8 +25,21 @@ def apply_per_square(bw, f):
 
         squares.append(row)
 
+    return squares
+
+def apply_per_square_and_recombine(bw, f):
+    assert(bw.shape == (800,800))
+
+    squares = apply_per_square(bw, f)
+
     rows = [ np.hstack(r) for r in squares ]
     return np.vstack(rows)
+
+def count_white(bw):
+    return cv2.countNonZero(bw[25:75,25:75])
+
+def avg_center(bw):
+    return np.mean(bw[40:60,40:60])
 
 # Frame should be BW
 def find_homography(frame):
@@ -150,6 +163,13 @@ def find_homography(frame):
 
     return None
 
+# Img must be BW
+def to_contours(img):
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    cl = clahe.apply(img)
+    edges = cv2.Canny(cl, 100, 250, apertureSize = 3)
+    return edges
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         # We read from a pre-recorded video
@@ -180,11 +200,29 @@ if __name__ == "__main__":
 
         reproj = cv2.warpPerspective(frame, homography, (800, 800))
         bw_reproj = pipeline.to_gray(reproj)
-        cv2.imshow("reproj", reproj)
 
-        # equalized = apply_per_square(bw_reproj, lambda f: cv2.equalizeHist(f))
-        equalized = cv2.equalizeHist(bw_reproj)
-        cv2.imshow("equalized", equalized)
+        blurred = cv2.GaussianBlur(bw_reproj, (0,0), 3)
+        sharp = cv2.addWeighted(bw_reproj, 1.5, blurred, -0.5, 0)
+        cv2.imshow("sharp", sharp)
+
+        contours = apply_per_square_and_recombine(sharp, to_contours)
+        cv2.imshow("contours", contours)
+
+        piece_mask = apply_per_square(contours, lambda x: count_white(x) > 20)
+        average_centers = apply_per_square(sharp, avg_center)
+
+        
+        for i in xrange(0,8):
+            for j in xrange (0,8):
+                if piece_mask[i][j]:
+                    if average_centers[i][j] < 128:
+                        sys.stdout.write("B ")
+                    else:
+                        sys.stdout.write("W ")
+                else:
+                    sys.stdout.write(". ")
+            sys.stdout.write("\n")
+        print ""
 
         # END OF WHILE LOOP
 
