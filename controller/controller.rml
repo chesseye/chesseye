@@ -122,7 +122,7 @@ let process output_messages position reset advice =
     Ochess.print_full_suggestion pos;
     match Ochess.game_status pos with
     | Ochess.Win color -> print_endline "ENDG checkmate"
-    | Ochess.Draw -> "ENDG stalemate"
+    | Ochess.Draw -> print_endline "ENDG stalemate"
     | Ochess.Play _ -> ()
   end
   ||
