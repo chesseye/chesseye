@@ -240,6 +240,10 @@ let parse_message msg =
   begin match String.sub msg 0 4 with
   | "MASK" ->
       MASK (mask_of_string (String.sub msg 5 128))
+  | "OBST" ->
+      OBST
+  | "NOCB" ->
+      NOCB
   | _ ->
       OTHER msg
   end
