@@ -757,7 +757,7 @@ let full_suggestion pos =
   "\"" ^ ed ^ "\" \"" ^ (string_of_move pos (suggest_move pos)) ^ "\""
 
 let print_full_suggestion pos =
-  printf "\n%s\n" (full_suggestion pos)
+  printf "%s\n" (full_suggestion pos)
 
 let main () = 
    set_signal sigint Signal_ignore; (* xboard sends these *)

@@ -112,7 +112,8 @@ let process check_init pos_inout mask_input r =
 let process output_messages position reset advice =
   loop
     await position (Some pos) in
-    print_endline "MOVD"
+    print_string "MOVD ";
+    Ochess.print_full_suggestion pos
   end
   ||
   loop
