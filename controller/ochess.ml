@@ -652,12 +652,12 @@ let suggest_move pos =
   | Win White -> game_over "1-0 {White wins}\n"
   | Win Black -> game_over "0-1 {Black wins}\n"
   | Play lm ->
-      SuggestedMove (List.hd lm)
-      (* assert (lm <> []); *)
-      (* let interval = thinking_interval (pos.number / 2)  (Exact 3.0) (30000.0) in *)
-      (* (match best_move pos interval with None -> assert false | Some mv -> *)
-      (*   (assert (List.mem mv lm); *)
-      (*    SuggestedMove mv)) *)
+      (* SuggestedMove (List.hd lm) *)
+      assert (lm <> []);
+      let interval = thinking_interval (pos.number / 2)  (Exact 0.01) (30000.0) in
+      (match best_move pos interval with None -> assert false | Some mv ->
+        (assert (List.mem mv lm);
+         SuggestedMove mv))
 
 let string_of_white_piece p =
   match p with
