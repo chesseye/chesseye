@@ -6,9 +6,10 @@ import watson
 
 def say(text):
     if watson.load_credentials() != None:
-        print "I haz watson"
-
-    subprocess.call([ "say", text ])
+        wav_file = watson.get_file(text)
+        print wav_file
+    else:
+        subprocess.call([ "say", text ])
 
 def say_fen_move(fen_str, uci_str):
     board = chess.Board(fen_str)
