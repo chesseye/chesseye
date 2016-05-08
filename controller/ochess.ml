@@ -671,7 +671,25 @@ let string_of_turn turn =
   match turn with
   | White -> "w"
   | Black -> "b"
-	
+
+let string_of_castling pos =
+  let acc = ref "" in
+  begin
+    match pos.cas_w with
+    | (true,true) -> acc := !acc ^ "KQ"
+    | (false,true) -> acc := !acc ^ "K"
+    | (true,false) -> acc := !acc ^ "Q"
+    | (false,false) -> ()
+  end;
+  begin
+    match pos.cas_b with
+    | (true,true) -> acc := !acc ^ "kq"
+    | (false,true) -> acc := !acc ^ "k"
+    | (true,false) -> acc := !acc ^ "q"
+    | (false,false) -> ()
+  end;
+  if !acc = "" then "-" else !acc
+
 let edwards_of_position pos =
   let acc = ref "" in
   let empties = ref 0 in
@@ -714,7 +732,7 @@ let edwards_of_position pos =
   done;
   begin
     acc := !acc ^ (string_of_turn pos.turn) ^ " ";
-    acc := !acc ^ "KQkq" ^ " ";
+    acc := !acc ^ (string_of_castling pos) ^ " ";
     acc := !acc ^ "-" ^ " ";
     acc := !acc ^ "0" ^ " ";
     acc := !acc ^ (string_of_int pos.number)
@@ -729,7 +747,7 @@ let full_suggestion pos =
   "\"" ^ ed ^ "\" \"" ^ (string_of_move pos (suggest_move pos)) ^ "\""
 
 let print_full_suggestion pos =
-  printf "\n[Suggestion]%s\n" (full_suggestion pos)
+  printf "\n%s\n" (full_suggestion pos)
 
 let main () = 
    set_signal sigint Signal_ignore; (* xboard sends these *)
