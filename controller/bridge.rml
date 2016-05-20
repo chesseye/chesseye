@@ -1,5 +1,7 @@
 open Types
 open Util
+
+
 let bridge s =
   try
     while true do
@@ -13,3 +15,26 @@ let bridge s =
     done
   with
   | _ -> ()
+
+
+let process bridge_async s =
+  run Rml_async.proc_of_fun bridge s
+
+
+let rec process bridge_sync s =
+  let line_opt =
+    try Some (input_line stdin) with _ -> None
+  in
+  begin match line_opt with
+  | Some line ->
+      begin match parse_message line with
+      | MASK m -> Rml_async.safe_emit s m
+      | OBST -> print_endline "OBST"
+      | NOCB -> print_endline "NOCB"
+      | OTHER msg -> print_endline msg
+      end;
+      pause;
+      run bridge_sync s
+  | None -> ()
+  end
+

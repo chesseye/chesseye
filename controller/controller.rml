@@ -113,7 +113,10 @@ let process main =
   signal position default None gather keep_last in
   signal advice default None gather keep_last in
   begin
-    run Rml_async.proc_of_fun Bridge.bridge mask;
+    if Config.async_input then
+      run Bridge.bridge_async mask
+    else
+      run Bridge.bridge_sync mask;
     exit 0
     ||
     loop
