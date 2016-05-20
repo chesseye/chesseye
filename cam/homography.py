@@ -3,7 +3,7 @@ import numpy as np
 
 import pipeline
 
-# Frame should be BW. Returns a homography to project onto a 800x800 image.
+# Returns a homography to project onto a 800x800 image.
 def find_homography(frame):
     debug = False
 
@@ -54,7 +54,7 @@ def find_homography(frame):
                 if is_v:
                     color = (0,255,0) # green
                 elif is_h:
-                    color = (0,255,0) # red
+                    color = (0,255,0) # also green
                 else:
                     color = (80,80,80) # some gray
 
