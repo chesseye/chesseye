@@ -17,6 +17,7 @@ val detect_promotion :
 val make_dmove : position -> dmove -> position
 val mask_of_position : position -> mask
 val print_mask : mask -> unit
+val print_diff : ((int * int) * color option * color option) list -> unit
 val parse_message : string -> input_message
 val possible_states_of_position : position -> possible_states
-val mask_cleanup : possible_states -> mask -> mask option
+val mask_cleanup : possible_states -> mask -> mask -> mask

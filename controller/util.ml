@@ -314,7 +314,7 @@ let possible_states_of_position pos =
     must_black = must_black;
     must_empty = must_empty; }
 
-let mask_cleanup possible_states mask =
+let mask_cleanup possible_states m1 m2 =
   let can_white = possible_states.can_white in
   let can_black = possible_states.can_black in
   let can_empty = possible_states.can_empty in
@@ -322,36 +322,34 @@ let mask_cleanup possible_states mask =
   let must_black = possible_states.must_black in
   let must_empty = possible_states.must_empty in
   let new_mask = Array.make_matrix 8 8 None in
-  try
-    for i = 0 to 7 do
-      for j = 0 to 7 do
-        begin match mask.(i).(j) with
-        | Some White ->
-            new_mask.(i).(j) <-
-              begin match can_white.(i).(j), must_black.(i).(j), must_empty.(i).(j) with
-              | true, false, false -> Some White
-              | false, true, false -> Some Black
-              | false, false, true -> None
-              | _ -> raise Break
-              end
-        | Some Black ->
-            new_mask.(i).(j) <-
-              begin match can_black.(i).(j), must_white.(i).(j), must_empty.(i).(j) with
-              | true, false, false -> Some Black
-              | false, true, false -> Some White
-              | false, false, true -> None
-              | _ -> raise Break
-              end
-        | None ->
-            new_mask.(i).(j) <-
-              begin match can_empty.(i).(j), must_white.(i).(j), must_white.(i).(j) with
-              | true, false, false -> None
-              | false, true, false -> Some White
-              | false, false, true -> Some Black
-              | _ -> raise Break
-              end
-        end
-      done
-    done;
-    Some new_mask
-  with Break -> None
+  for i = 0 to 7 do
+    for j = 0 to 7 do
+      begin match m2.(i).(j) with
+      | Some White ->
+          new_mask.(i).(j) <-
+            begin match can_white.(i).(j), must_black.(i).(j), must_empty.(i).(j) with
+            | true, false, false -> Some White
+            | false, true, false -> Some Black
+            | false, false, true -> None
+            | _ -> m1.(i).(j)
+            end
+      | Some Black ->
+          new_mask.(i).(j) <-
+            begin match can_black.(i).(j), must_white.(i).(j), must_empty.(i).(j) with
+            | true, false, false -> Some Black
+            | false, true, false -> Some White
+            | false, false, true -> None
+            | _ -> m1.(i).(j)
+            end
+      | None ->
+          new_mask.(i).(j) <-
+            begin match can_empty.(i).(j), must_white.(i).(j), must_white.(i).(j) with
+            | true, false, false -> None
+            | false, true, false -> Some White
+            | false, false, true -> Some Black
+            | _ -> m1.(i).(j)
+            end
+      end
+    done
+  done;
+  new_mask

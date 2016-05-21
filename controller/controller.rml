@@ -4,7 +4,7 @@ open Util
 let nb_repetition dmov =
   begin match dmov with
   | DUndo -> 3
-  | _ -> 1
+  | _ -> 2
   end
 
 let is_stable_move =
@@ -28,23 +28,19 @@ let is_stable_move =
 let process position_of_mask mask_input pos_output pos_init =
   let rec process position_of_mask pos m1 possible_states =
     await mask_input (Some m2) in
-    begin match mask_cleanup possible_states m2 with
-    | Some m2' ->
-        let dmove = dmove_of_masks pos m1 m2' in
-        let pos' = make_dmove pos dmove in
-        if pos.number <> pos'.number then begin
-          let stable_move = is_stable_move dmove in
-          if stable_move then begin
-            emit pos_output pos';
-            run position_of_mask pos' (mask_of_position pos') (possible_states_of_position pos')
-          end else begin
-            run position_of_mask pos m1 possible_states
-          end
-        end else begin
-          run position_of_mask pos m1 possible_states
-        end
-    | None ->
+    let m2' = mask_cleanup possible_states m1 m2 in
+    let dmove = dmove_of_masks pos m1 m2' in
+    let pos' = make_dmove pos dmove in
+    if pos.number <> pos'.number then begin
+      let stable_move = is_stable_move dmove in
+      if stable_move then begin
+        emit pos_output pos';
+        run position_of_mask pos' (mask_of_position pos') (possible_states_of_position pos')
+      end else begin
         run position_of_mask pos m1 possible_states
+      end
+    end else begin
+      run position_of_mask pos m1 possible_states
     end
   in
   run position_of_mask pos_init (mask_of_position pos_init) (possible_states_of_position pos_init)
