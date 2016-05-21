@@ -273,3 +273,88 @@ let parse_message msg =
   | _ ->
       OTHER msg
   end
+
+exception Break
+
+let possible_states_of_position pos =
+  let moves = Ochess.legal_moves pos in
+  let positions =
+    List.map (fun move -> Ochess.make_move pos move 0) moves
+  in
+  let can_white = Array.make_matrix 8 8 false in
+  let can_black = Array.make_matrix 8 8 false in
+  let can_empty = Array.make_matrix 8 8 false in
+  let must_white = Array.make_matrix 8 8 true in
+  let must_black = Array.make_matrix 8 8 true in
+  let must_empty = Array.make_matrix 8 8 true in
+  for i = 0 to 7 do
+    for j = 0 to 7 do
+      List.iter
+        (fun p ->
+          begin match p.ar.(i).(j) with
+            | Piece (_, White) ->
+                can_white.(i).(j) <- true;
+                must_black.(i).(j) <- false;
+                must_empty.(i).(j) <- false
+            | Piece (_, Black) ->
+                can_black.(i).(j) <- true;
+                must_white.(i).(j) <- false;
+                must_empty.(i).(j) <- false
+            | Empty ->
+                can_empty.(i).(j) <- true;
+                must_white.(i).(j) <- false;
+                must_black.(i).(j) <- false
+          end)
+        positions
+    done
+  done;
+  { moves = moves;
+    positions = positions;
+    can_white = can_white;
+    can_black = can_black;
+    can_empty = can_empty;
+    must_white = must_white;
+    must_black = must_black;
+    must_empty = must_empty; }
+
+let mask_cleanup possible_states mask =
+  let can_white = possible_states.can_white in
+  let can_black = possible_states.can_black in
+  let can_empty = possible_states.can_empty in
+  let must_white = possible_states.must_white in
+  let must_black = possible_states.must_black in
+  let must_empty = possible_states.must_empty in
+  let new_mask = Array.make_matrix 8 8 None in
+  try
+    for i = 0 to 7 do
+      for j = 0 to 7 do
+        begin match mask.(i).(j) with
+        | Some White ->
+            new_mask.(i).(j) <-
+              begin match can_white.(i).(j), must_black.(i).(j), must_empty.(i).(j) with
+              | true, false, false -> Some White
+              | false, true, false -> Some Black
+              | false, false, true -> None
+              | _ -> raise Break
+              end
+        | Some Black ->
+            new_mask.(i).(j) <-
+              begin match can_black.(i).(j), must_white.(i).(j), must_empty.(i).(j) with
+              | true, false, false -> Some Black
+              | false, true, false -> Some White
+              | false, false, true -> None
+              | _ -> raise Break
+              end
+        | None ->
+            new_mask.(i).(j) <-
+              begin match can_empty.(i).(j), must_white.(i).(j), must_white.(i).(j) with
+              | true, false, false -> None
+              | false, true, false -> Some White
+              | false, false, true -> Some Black
+              | _ -> raise Break
+              end
+        end
+      done
+    done;
+    Some new_mask
+  with Break -> None

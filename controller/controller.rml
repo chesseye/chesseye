@@ -26,23 +26,28 @@ let is_stable_move =
       false
 
 let process position_of_mask mask_input pos_output pos_init =
-  let rec process position_of_mask pos_history pos m1 =
+  let rec process position_of_mask pos_history pos m1 possible_states =
     await mask_input (Some m2) in
-    let dmove = dmove_of_masks pos m1 m2 in
-    let (pos', pos_history) = make_dmove pos_history pos dmove in
-    if pos.number <> pos'.number then begin
-      let stable_move = is_stable_move dmove in
-      if stable_move then begin
-        emit pos_output pos';
-        run position_of_mask pos_history pos' (mask_of_position pos')
-      end else begin
-      run position_of_mask pos_history pos m1
-      end
-    end else begin
-      run position_of_mask pos_history pos m1
+    begin match mask_cleanup possible_states m2 with
+    | Some m2' ->
+        let dmove = dmove_of_masks pos m1 m2' in
+        let (pos', pos_history) = make_dmove pos_history pos dmove in
+        if pos.number <> pos'.number then begin
+          let stable_move = is_stable_move dmove in
+          if stable_move then begin
+            emit pos_output pos';
+            run position_of_mask pos_history pos' (mask_of_position pos') (possible_states_of_position pos')
+          end else begin
+            run position_of_mask pos_history pos m1 possible_states
+          end
+        end else begin
+          run position_of_mask pos_history pos m1 possible_states
+        end
+    | None ->
+        run position_of_mask pos_history pos m1 possible_states
     end
   in
-  run position_of_mask [] pos_init (mask_of_position pos_init)
+  run position_of_mask [] pos_init (mask_of_position pos_init) (possible_states_of_position pos_init)
 
 
 let process print_position pos_input =

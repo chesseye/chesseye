@@ -39,4 +39,13 @@ type input_message =
   | OBST
   | NOCB
   | OTHER of string
+type possible_states =
+    { moves : move list;
+      positions : position list;
+      can_white : bool array array;
+      can_black : bool array array;
+      can_empty : bool array array;
+      must_white : bool array array;
+      must_black : bool array array;
+      must_empty : bool array array; }
 
