@@ -237,27 +237,24 @@ let detect_promotion pos (i1,i2,i3,i4) =
   (* To be done *)
   make_legal_move pos (Move (i1,i2,i3,i4))
 
-let make_dmove pos_history pos dmove =
+let make_dmove pos dmove =
   match dmove with
-  | DNoMove -> (pos, pos_history)
+  | DNoMove -> pos
   | DMove (i1,i2,i3,i4) ->
       let pos = detect_promotion pos (i1,i2,i3,i4) in
-      (pos, pos::pos_history)
+      pos
   | DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
-      let pos = make_legal_move pos (Move (i1,i2,i3,i4)) in
-      (pos, pos::pos_history)
+      make_legal_move pos (Move (i1,i2,i3,i4))
   | DQueenside_castle ->
-      let pos = make_legal_move pos Queenside_castle in
-      (pos, pos::pos_history)
+      make_legal_move pos Queenside_castle
   | DKingside_castle ->
-      let pos = make_legal_move pos Kingside_castle in
-      (pos, pos::pos_history)
+      make_legal_move pos Kingside_castle
   | DUndo ->
-      begin match pos_history with
-      | previous_pos::pos_history -> (previous_pos, pos_history)
-      | [] -> (pos, pos_history)
+      begin match pos.prev with
+      | Some previous_pos -> previous_pos
+      | None -> pos
       end
-  | DError -> (pos, pos_history)
+  | DError -> pos
 
 let mask_of_position pos =
   (mask_of_string (string_of_position pos))
