@@ -1,19 +1,49 @@
 open Types
 
+let char_of_color c =
+  match c with
+  | White -> 'W'
+  | Black -> 'B'
+
 let print_mask m =
-    let separator = "\n   +----+----+----+----+----+----+----+----+\n" in
-    print_string separator;
-    for j = 7 downto 0 do
-        Printf.printf " %d |" (j + 1);
-        for i = 0 to 7 do
-            match m.(i).(j) with
-            | Some White -> print_string "  W |"
-            | Some Black -> print_string "  B |"
-            | None -> print_string "    |"
-        done;
-        print_string separator;
+  let separator = "\n   +----+----+----+----+----+----+----+----+\n" in
+  print_string separator;
+  for j = 7 downto 0 do
+    Printf.printf " %d |" (j + 1);
+    for i = 0 to 7 do
+      match m.(i).(j) with
+      | Some c -> Printf.printf "  %c |" (char_of_color c)
+      | None -> print_string "    |"
     done;
-    print_string "\n      a    b    c    d    e    f    g    h\n"
+    print_string separator;
+  done;
+  print_string "\n      a    b    c    d    e    f    g    h\n"
+
+let print_diff diff =
+  let separator = "\n   +----+----+----+----+----+----+----+----+\n" in
+  print_string separator;
+  for j = 7 downto 0 do
+    Printf.printf " %d |" (j + 1);
+    for i = 0 to 7 do
+      try
+        let (_, before, after) =
+          List.find (fun ((i', j'),_, _) -> i = i' && j = j') diff
+        in
+        match before, after with
+        | Some(c1), Some(c2) ->
+            Printf.printf " %c%c |" (char_of_color c1) (char_of_color c2)
+        | Some(c1), None ->
+            Printf.printf " %c. |" (char_of_color c1)
+        | None, Some(c2) ->
+            Printf.printf " .%c |" (char_of_color c2)
+        | None, None -> print_string "    |"
+      with Not_found ->
+        print_string "    |"
+    done;
+    print_string separator;
+  done;
+  print_string "\n      a    b    c    d    e    f    g    h\n"
+
 
 let warning s =
   Printf.eprintf "%s\n" s
@@ -115,8 +145,9 @@ let chose_castle_side (c1,c2,c3,c4) =
     DError
 
 (* Main move detection *)
-let dmove_of_masks (turn:color) (m1:mask) (m2:mask): dmove =
-  begin match diff_mask m1 m2 with
+let dmove_of_masks (p:position) (m1:mask) (m2:mask): dmove =
+  let diff = diff_mask m1 m2 in
+  begin match diff with
   | [] -> DNoMove
   | [ _ ] -> DError
   | [ ((i1,j1), Some color1, None);
@@ -124,7 +155,7 @@ let dmove_of_masks (turn:color) (m1:mask) (m2:mask): dmove =
   | [ ((i2,j2), None, Some color1');
       ((i1,j1), Some color1, None); ] ->
       if color1 = color1' then
-        if turn = color1 then DMove (i1, j1, i2, j2)
+        if p.turn = color1 then DMove (i1, j1, i2, j2)
         else DUndo
       else
         DError
