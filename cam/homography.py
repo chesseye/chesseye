@@ -5,7 +5,7 @@ import pipeline
 
 # Returns a homography to project onto a 800x800 image.
 def find_homography(frame):
-    debug = False
+    debug = True
 
     if debug:
         debug_frame = np.copy(frame)
@@ -97,7 +97,7 @@ def find_homography(frame):
             dim2 = bot_right[1] - top_left[1]
             ratio = float(dim1) / float(dim2)
     
-            if ratio > 1.1 and ratio < 1.3:
+            if ratio > 0.8 and ratio < 1.2:
                 cv2.rectangle(frame, (min(good_corners_xs), min(good_corners_ys)), (max(good_corners_xs), max(good_corners_ys)), (0,0,255), 2)
 
                 src_points = np.zeros((len(good_corners),1,2), np.float32)

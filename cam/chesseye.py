@@ -43,7 +43,7 @@ if __name__ == "__main__":
         if ui:
             cv2.imshow("frame", frame)
 
-        if H is None:
+        if True or H is None:
             new_h = homography.find_homography(frame)
             if new_h is not None:
                 H = new_h
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
         masks = pieces.find_pieces(sharp)
 
-        if pieces.sanity_check(masks):
+        if True or pieces.sanity_check(masks):
             print "MASK %s" % pieces.masks_to_string(masks)
             sys.stdout.flush()
         else:
@@ -73,11 +73,11 @@ if __name__ == "__main__":
 
         feedback = pipeline.to_color(sharp)
 
-        if pieces.sanity_check(masks):
-            pieces.draw_pieces(feedback, masks)
-
         if ui:
+            if (True or pieces.sanity_check(masks)):
+                pieces.draw_pieces(feedback, masks)
             cv2.imshow("feedback", feedback)
+
         # END OF WHILE LOOP
 
     cap.release()

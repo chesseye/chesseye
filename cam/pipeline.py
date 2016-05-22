@@ -78,6 +78,16 @@ def hough_to_two_points(rho, theta):
     
     return ((x1,y1),(x2,y2))
 
+def apply_clahe(img):
+    median = cv2.medianBlur(img, 11)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    cl = clahe.apply(median)
+    return cl
+
+def apply_otsu(img):
+    _,thresh = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    return thresh
+
 # Img must be BW
 def get_contours(img):
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))

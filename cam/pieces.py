@@ -45,8 +45,12 @@ def avg_center(bw):
 # The positions are enumerated by A-file first, 1st to 8th rank, so:
 # a1, a2, a3... a8, b1, ... b8, c1, ... h8
 def find_pieces(img):
-    debug = False
+    debug = True
 
+    if debug:
+        otsu = apply_per_square_and_recombine(img, pipeline.apply_otsu)
+        cv2.imshow("otsu", otsu)
+    
     contours = apply_per_square_and_recombine(img, pipeline.get_contours)
     if debug:
         cv2.imshow("contours", contours)
