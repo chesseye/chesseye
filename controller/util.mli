@@ -12,9 +12,7 @@ val consistent_line_and_color :
   color * color * color * color -> bool
 val chose_castle_side : int * int * int * int -> dmove
 val dmove_of_masks : position -> mask -> mask -> dmove
-val detect_promotion :
-  position -> int * int * int * int -> position
-val make_dmove : position -> dmove -> position
+val move_of_dmove : position -> dmove -> move option
 val mask_of_position : position -> mask
 val print_mask : mask -> unit
 val print_diff : ((int * int) * color option * color option) list -> unit

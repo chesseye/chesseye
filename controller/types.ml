@@ -25,6 +25,7 @@ type mask = color option array array
 type move = Move of int * int * int * int
           | Kingside_castle | Queenside_castle
           | Promotion of piece_type * int * int (* the int's are initial column and final column *)
+          | Undo
 
 type dmove =
   | DNoMove

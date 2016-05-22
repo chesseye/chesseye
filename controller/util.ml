@@ -227,34 +227,42 @@ let dmove_of_masks (p:position) (m1:mask) (m2:mask): dmove =
       DError
   end
 
-let make_legal_move pos move =
-  if List.mem move (Ochess.legal_moves pos) then
-    (Ochess.make_move pos move 0)
-  else
-    (pos)
+let is_legal_move pos move =
+  List.mem move (Ochess.legal_moves pos)
 
-let detect_promotion pos (i1,i2,i3,i4) =
-  (* To be done *)
-  make_legal_move pos (Move (i1,i2,i3,i4))
+let is_promotion pos (i1,j1,i2,j2) =
+  false (* TODO *)
 
-let make_dmove pos dmove =
-  match dmove with
-  | DNoMove -> pos
-  | DMove (i1,i2,i3,i4) ->
-      let pos = detect_promotion pos (i1,i2,i3,i4) in
-      pos
-  | DEnPassant (color,(i1,i2,i3,i4),(o1,o2)) ->
-      make_legal_move pos (Move (i1,i2,i3,i4))
-  | DQueenside_castle ->
-      make_legal_move pos Queenside_castle
-  | DKingside_castle ->
-      make_legal_move pos Kingside_castle
-  | DUndo ->
-      begin match pos.prev with
-      | Some previous_pos -> previous_pos
-      | None -> pos
-      end
-  | DError -> pos
+let move_of_dmove pos dmove =
+  let move_opt =
+    match dmove with
+    | DNoMove -> None
+    | DMove (i1,j1,i2,j2) ->
+        if is_promotion pos (i1,j1,i2,j2) then
+          Some (Promotion (Queen, i1, i2)) (* TODO: check *)
+        else
+          Some (Move (i1,j1,i2,j2))
+    | DEnPassant (color,(i1,j1,i2,j2),(o1,o2)) ->
+        Some (Move (i1,j1,i2,j2))
+    | DQueenside_castle ->
+        Some Queenside_castle
+    | DKingside_castle ->
+        Some Kingside_castle
+    | DUndo ->
+        begin match pos.prev with
+        | Some previous_pos -> Some Undo
+        | None -> None
+        end
+    | DError -> None
+  in
+  begin match move_opt with
+  | Some move ->
+      if is_legal_move pos move then
+        Some move
+      else
+        None
+  | None -> None
+  end
 
 let mask_of_position pos =
   (mask_of_string (string_of_position pos))

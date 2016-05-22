@@ -208,7 +208,8 @@ let make_move pos m del =
                     | Black -> if y2 = 2 then ar2.(i).(3) <- Empty)
                 | _ -> ());
             {tmp with en_passant = e2})
-        | Knight | Bishop | Queen -> tmp)))
+        | Knight | Bishop | Queen -> tmp))
+    | Undo -> assert false)
     in {ret with irr_change = (if !ic (* || pos.cas_w <> ret.cas_w || pos.cas_b <> ret.cas_b *) then 0 else pos.irr_change + 1)}
         
 
@@ -430,7 +431,8 @@ let delta pos mv =
       | Empty -> raise Illegal_move
       | Piece(pt, c) -> piece_value pt x2 y2 c - piece_value pt x1 y1 c + field_value pos x2 y2)
     | Promotion(pt, x1, x2) -> let (y1,y2) = match pos.turn with White -> (6,7) | Black -> (1, 0) in
-                               piece_value pt x2 y2 pos.turn - piece_value Pawn x1 y1 pos.turn + field_value pos x2 y2)
+                               piece_value pt x2 y2 pos.turn - piece_value Pawn x1 y1 pos.turn + field_value pos x2 y2
+    | Undo -> assert false)
  
 
 (* 
@@ -546,6 +548,7 @@ let print_move (p:position) = function (* does not check validity *)
     | Promotion(pt, x1, x2) -> 
         let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
         printf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (char_of_piece_type pt))
+    | Undo -> printf "Undo"
 
 let string_of_move (p:position) : (move -> string) = function (* does not check validity *)
   | Move(x1, y1, x2, y2) -> 
@@ -557,6 +560,7 @@ let string_of_move (p:position) : (move -> string) = function (* does not check 
   | Promotion(pt, x1, x2) -> 
       let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
       Printf.sprintf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (char_of_piece_type pt))
+  | Undo -> "Undo"
 
 let string_of_smove (p:position) : (smove -> string) = function (* does not check validity *)
   | GameOver msg -> msg
@@ -754,7 +758,15 @@ let print_edwards pos =
 let long_string_of_smove pos smove =
   let ed = edwards_of_position pos in
   "\"" ^ ed ^ "\" \"" ^ (string_of_smove pos smove) ^ "\""
-								       
+
+let long_string_of_move move pos =
+  match pos.prev with
+  | Some prev ->
+      let ed = edwards_of_position prev in
+      "\"" ^ ed ^ "\" \"" ^ (string_of_move prev move) ^ "\""
+  | None ->
+      "INIT"
+
 let full_suggestion pos =
   long_string_of_smove pos (suggest_move pos)
 

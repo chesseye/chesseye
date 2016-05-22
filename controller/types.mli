@@ -23,6 +23,7 @@ type move =
   | Kingside_castle
   | Queenside_castle
   | Promotion of piece_type * int * int
+  | Undo
 type dmove =
   | DNoMove
   | DMove of int * int * int * int
