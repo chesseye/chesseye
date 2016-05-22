@@ -26,16 +26,19 @@ def pronounce_move(fen_str, uci_str):
     move = board.parse_uci(uci_str)
 
     san = board.san(move)
-    
-    s = " ".join(san)
 
-    s = s.replace("K", "king")
-    s = s.replace("Q", "queen")
-    s = s.replace("R", "rook")
-    s = s.replace("B", "bishop")
-    s = s.replace("N", "knight")
-    s = s.replace("x", "takes")
-    s = s.replace("+", "check!")
+    s = san
+
+    # TODO the pronounciation of Rad1 is not great yet ("Rook ad1" sounds like "Rook add one")
+
+    s = s.replace("K", "king ")
+    s = s.replace("Q", "queen ")
+    s = s.replace("R", "rook ")
+    s = s.replace("B", "bishop ")
+    s = s.replace("N", "knight ")
+    s = s.replace("x", " takes ")
+    s = s.replace("+", ", check!")
+    s = s.replace("#", ", checkmate!")
 
     return s
 
@@ -62,10 +65,11 @@ if __name__ == "__main__":
             rest = line[5:]
 
             if verb == "MOVD" and not last_was_rest:
-                say("Move registered.")
-                # m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
-                # if m is not None:
-                #     say(pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1]))
+                m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
+                if m is not None:
+                    say(pronounce_move(m.group(1)[1:-1], m.group(2)[1:-1]))
+                else:
+                    say("Move registered.")
 
             elif verb == "KIBB":
                 m = re.match("""^("[^"]*") ("[^"]*")$""", rest)
@@ -78,7 +82,7 @@ if __name__ == "__main__":
             elif verb == "REST" and not last_was_rest:
                 say("The board was reset.")
             elif verb == "ENDG":
-                say(rest)
+                say("The game is over by " + rest)
 
             if verb == "REST":
                 last_was_rest = True
