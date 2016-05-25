@@ -43,7 +43,7 @@ if __name__ == "__main__":
         if ui:
             cv2.imshow("frame", frame)
 
-        if True or H is None:
+        if H is None:
             new_h = homography.find_homography(frame)
             if new_h is not None:
                 H = new_h

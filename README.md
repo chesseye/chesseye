@@ -8,10 +8,11 @@ This is the repository of the [ChessEye project, made at Techcrunch Disrupt 2016
   * [ReactiveML](http://reactiveml.org) (`opam install rml`)
   * ChessEye has been tested on MacOSX and Ubuntu.
 
-## Compile
-  * `(cd controller; make)`
+## Building and testing
+  * `make`
+  * `make test`
 
-## Run
+## Running
   * To read data from the second camera (e.g. USB webcam on a laptop), and have the computer suggest moves for black, run: `python cam/chesseye.py --src=1 | controller/controller -kibbitz 1 | python voice/speak.py`
   * To transcribe a video of a game to PGN, run `python cam/chesseye.py --src=game.mov --no-ui | controller/controller -kibbitz 0 | python export/pgn.py`
 
