@@ -2,7 +2,7 @@
 
 all: controller
 
-controller: 
+controller:
 	(cd controller; make)
 
 test:

@@ -29,7 +29,7 @@ class HomographyTests(unittest.TestCase):
             fn = d["filename"]
             img = cv2.imread(fn)
 
-            H = homography.find_homography(img, debug=True)
+            H = homography.find_homography(img, debug=False)
 
             # Checks that we find a chessboard.
             self.assertTrue(H is not None, "In image '%s', could not find homography." % d["filename"])
@@ -41,10 +41,10 @@ class HomographyTests(unittest.TestCase):
             if "corners" in d:
                 # The corner positions in the metadata.
                 img_corner_positions = np.array(
-                    [ [ c["x"], c["y"], 1.0 ] for c in d["corners"] ],
+                    [ [ c["x"], c["y"] ] for c in d["corners"] ],
                     np.float64)
 
-                # The corner positions in the idealized image.
+                # The corner positions in the idealized image, in homogeneous coordinates.
                 proj_corner_positions = np.array([
                     [   0.0,   0.0, 1.0 ],
                     [ 800.0,   0.0, 1.0 ],
@@ -57,15 +57,17 @@ class HomographyTests(unittest.TestCase):
 
                 back_projected_corners = np.dot(Hinv, proj_corner_positions.T).T
 
+                # Convert back to cartesian coords.
+                cartesian = np.divide(back_projected_corners, back_projected_corners[:,2].reshape(-1,1))[:,[0,1]]
+
                 # Compute best match for each point, and ensures it's "close enough"
                 min_img_dim = float(min(img.shape[0], img.shape[1]))
-                # The distance from a corner of a square to the center of that
-                # square if the chessboard occupied the full image. Arbitrary :)
-                max_tolerated_distance = (min_img_dim / 8.0) * np.sqrt(2.0) / 2.0
+                max_tolerated_distance = min_img_dim / 8.0 / 5.0 # 20% of square size (arbitrary).
+
                 for i in xrange(0, img_corner_positions.shape[0]):
                     m_dist = 1e10
                     for j in xrange(0, 4):
-                        dist = np.linalg.norm(img_corner_positions[i] - back_projected_corners[j])
+                        dist = np.linalg.norm(img_corner_positions[i] - cartesian[j])
                         m_dist = min(m_dist, dist)
 
                     self.assertTrue(m_dist < max_tolerated_distance, "In img '%s', corners should match metadata." % d["filename"])
@@ -73,16 +75,11 @@ class HomographyTests(unittest.TestCase):
             # TODO check that this really looks like a chessboard...
             # Maybe count squares that are "mostly black/white" in binarized img?
 
-            # reproj = cv2.warpPerspective(img, H, (800, 800))
-            # cv2.imshow("reproj-%d" % self.r(), reproj)
-
             # binary = pipeline.binarize(pipeline.to_gray(reproj), 0.2)
             # cv2.imshow("binary-%d" % self.r(), binary)
 
             # FIXME not ready for prime time
             # homography.check_homography(img, H)
-
-            r = raw_input()
 
 if __name__ == "__main__":
     unittest.main()

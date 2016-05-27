@@ -47,13 +47,7 @@ def avg_center(bw):
 def find_pieces(img):
     debug = True
 
-    if debug:
-        otsu = apply_per_square_and_recombine(img, pipeline.apply_otsu)
-        cv2.imshow("otsu", otsu)
-    
     contours = apply_per_square_and_recombine(img, pipeline.get_contours)
-    if debug:
-        cv2.imshow("contours", contours)
 
     piece_mask = apply_per_square(contours, lambda x: count_white(x) > 20)
     average_centers = apply_per_square(img, avg_center)
@@ -108,4 +102,4 @@ def draw_pieces(img, masks):
                 cv2.rectangle(img, (x+10,y+10), (x+90,y+90), (255,0,0), 2)
             elif masks["black"][c]:
                 cv2.rectangle(img, (x+10,y+10), (x+90,y+90), (0,0,255), 2)
-            
+

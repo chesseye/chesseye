@@ -25,9 +25,7 @@ def pronounce_move(fen_str, uci_str):
     board = chess.Board(fen_str)
     move = board.parse_uci(uci_str)
 
-    san = board.san(move)
-
-    s = san
+    s = board.san(move)
 
     # TODO the pronounciation of Rad1 is not great yet ("Rook ad1" sounds like "Rook add one")
 

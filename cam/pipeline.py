@@ -51,7 +51,7 @@ def hough_dist(points, rho, theta):
     distances = np.abs(rotated_points.T[:, 0] - rho)
 
     return distances
-        
+
 def hough_to_two_points(rho, theta):
     a = np.cos(theta)
     b = np.sin(theta)
@@ -61,7 +61,7 @@ def hough_to_two_points(rho, theta):
     y1 = int(y0 + 1000*(a))
     x2 = int(x0 - 1000*(-b))
     y2 = int(y0 - 1000*(a))
-    
+
     return ((x1,y1),(x2,y2))
 
 def apply_clahe(img):

@@ -2,7 +2,7 @@
     {
         "filename": "001.png",
         "orientation": "E",
-        "cornersxx": [
+        "corners": [
             { "x":  76, "y":   7 },
             { "x": 526, "y":   2 },
             { "x":  40, "y": 468 },

@@ -8,30 +8,37 @@ import pieces
 def r():
     return int(random.uniform(10000, 99999))
 
-# M must be a n x m boolean matrix.
-def covering_rows(M):
-    rows = [ 1 ]
-    mask = M[0]
 
-    for i in xrange(1, M.shape[0]):
-        new_mask = np.logical_or(mask, M[i])
-        if not np.array_equal(mask, new_mask):
-            rows.append(i)
-        mask = new_mask
+def draw_line_from_vector_and_point(img, quadruple, color):
+    vx = quadruple[0]
+    vy = quadruple[1]
+    x0 = quadruple[2]
+    y0 = quadruple[3]
 
-    return M[np.array(rows),:]
+    x1 = x0 + 1000.0 * vx
+    y1 = y0 + 1000.0 * vy
+    x2 = x0 - 1000.0 * vx
+    y2 = y0 - 1000.0 * vy
 
-# http://stackoverflow.com/a/16973510/358642
-def unique_rows(M):
-    N = np.ascontiguousarray(M).view(np.dtype((np.void, M.dtype.itemsize * M.shape[1])))
-    _, idx = np.unique(N, return_index=True)
-    return M[idx]
+    cv2.line(img,(x1,y1),(x2,y2),color,1)
+
+def intersects_from_vector_and_point(quadruple):
+    vx = quadruple[0]
+    vy = quadruple[1]
+    x0 = quadruple[2]
+    y0 = quadruple[3]
+
+    return (x0 - (y0 * vx / vy), y0 - (x0 * vy / vx))
 
 # Takes a set of points and two sets of lines. Filters out every point that is
 # not on one line from each set, and return a mapping from the remaining point to a line id.
 def filter_corner_and_lines(corners, h_lines, v_lines, max_dist):
     if not corners or len(corners) < 3 or not h_lines or len(h_lines) < 2 or not v_lines or len(v_lines) < 2:
         return None
+
+    # num(corners) * 2 matrix with x,y coords.
+    points = np.array(corners, np.float64)
+    assert(points.shape == (len(corners), 2))
 
     # Matrices storing the distances between every line and every point.
     h_dists = np.vstack([ pipeline.hough_dist(corners, rho, theta) for rho,theta in h_lines ])
@@ -44,30 +51,58 @@ def filter_corner_and_lines(corners, h_lines, v_lines, max_dist):
     # Counts the number of lines to which each point is close.
     h_points_to_lines = np.sum(h_close, axis=0) > 0
     v_points_to_lines = np.sum(v_close, axis=0) > 0
+
     # Points that are at intersections.
     points_at_inter = np.logical_and(h_points_to_lines, v_points_to_lines)
 
-    print "there are %d points on intersections." % np.sum(points_at_inter)
+    # Let's group vertically/horizontally aligned points into classes.
+    h_classes = []
+    for i in xrange(0, h_close.shape[1]):
+        h_l_is = h_close[:,i] # A column indicating which lines are close.
+        h_l_s = h_close[h_l_is, :] # All rows for lines to which point is close
+        companions = np.nonzero(np.any(h_l_s, axis=0))[0]
+        if companions.size > 1 and i == np.min(companions):
+            h_classes.append({ "point_ids": companions.tolist() })
 
-    print "BEFORE"
-    print h_close.shape
-    print v_close.shape
+    v_classes = []
+    for i in xrange(0, v_close.shape[1]):
+        v_l_is = v_close[:,i] # A column indicating which lines are close.
+        v_l_s = v_close[v_l_is, :] # All rows for lines to which point is close
+        companions = np.nonzero(np.any(v_l_s, axis=0))[0]
+        if companions.size > 1 and i == np.min(companions):
+            v_classes.append({ "point_ids": companions.tolist() })
 
-    # We recompute distances with more slack, and only for points that were on intersections
-    h_close = h_dists[:, points_at_inter] <= (2 * max_dist)
-    v_close = v_dists[:, points_at_inter] <= (2 * max_dist)
+    def line_from_point_ids(point_ids):
+        class_points = points[np.array(point_ids), :]
+        return cv2.fitLine(class_points, cv2.DIST_L2, 0, 0.01, 0.01)
 
-    # We drop lines with a single point.
-    h_close = h_close[np.sum(h_close, axis=1) > 1, :]
-    v_close = v_close[np.sum(v_close, axis=1) > 1, :]
-    # We deduplicate rows
-    h_close = unique_rows(h_close)
-    v_close = unique_rows(v_close)
-    print "AFTER"
-    print h_close.shape
-    print v_close.shape
+    for k in h_classes:
+        l = line_from_point_ids(k["point_ids"])
+        _, yi = intersects_from_vector_and_point(l)
+        k["interpolated"] = l
+        k["y_intersect"] = yi
 
-    return None
+    for k in v_classes:
+        l = line_from_point_ids(k["point_ids"])
+        xi, _ = intersects_from_vector_and_point(l)
+        k["interpolated"] = l
+        k["x_intersect"] = xi
+
+    h_classes.sort(key=lambda e: e["y_intersect"])
+    v_classes.sort(key=lambda e: e["x_intersect"])
+
+    h_assignment = {}
+    v_assignment = {}
+
+    for i, k in enumerate(h_classes):
+        for pid in k["point_ids"]:
+            h_assignment[pid] = i
+
+    for i, k in enumerate(v_classes):
+        for pid in k["point_ids"]:
+            v_assignment[pid] = i
+
+    return (h_assignment, v_assignment, h_classes, v_classes)
 
 # Returns a homography to project onto a 800x800 image.
 def find_homography(frame, debug=False):
@@ -81,10 +116,10 @@ def find_homography(frame, debug=False):
 
     # Minimum expected size of the board (arbitrary)
     min_board_size = 0.7 * img_min
-    
+
     # Grayscale
     bw = pipeline.to_gray(frame)
-    
+
     # Tracking features, hopefully finding lots of corners
     corners = pipeline.get_corners(bw, 100, min_board_size / 12)
 
@@ -93,7 +128,7 @@ def find_homography(frame, debug=False):
 
     # Edge detector.
     # FIXME check constants? which ones depend on image size?
-    edges = cv2.Canny(binary, 100, 250, apertureSize = 3) 
+    edges = cv2.Canny(binary, 100, 250, apertureSize = 3)
 
     # Thicker edges.
     # FIXME depends on image size?
@@ -119,76 +154,57 @@ def find_homography(frame, debug=False):
                 is_v = True
 
             if debug:
-                if is_v:
-                    color = (0,255,0) # green
-                elif is_h:
-                    color = (0,255,0) # also green
-                else:
+                if is_v or is_h:
                     color = (80,80,80) # some gray
 
                 (x1,y1),(x2,y2) = pipeline.hough_to_two_points(rho, theta)
                 cv2.line(debug_frame,(x1,y1),(x2,y2),color,1)
 
-    # Not ready for prime time
-    filter_corner_and_lines(corners, h_lines, v_lines, 4)
-
+    # work in progress
     if h_lines and v_lines and corners:
-        good_corners = []
+        h_assignment, v_assignment, h_classes, v_classes = filter_corner_and_lines(corners, h_lines, v_lines, 4)
+        num_h_classes = len(h_classes)
+        num_v_classes = len(v_classes)
 
-        all_h_dists = np.vstack([ pipeline.hough_dist(corners, rho, theta) for rho,theta in h_lines ])
-        all_v_dists = np.vstack([ pipeline.hough_dist(corners, rho, theta) for rho,theta in v_lines ])
+        if debug:
+            for k in v_classes:
+                draw_line_from_vector_and_point(debug_frame, k["interpolated"], (0,255,0))
+                cv2.circle(debug_frame, (k["x_intersect"],0), 5, (0,0,255), -1)
+            for k in h_classes:
+                draw_line_from_vector_and_point(debug_frame, k["interpolated"], (0,255,0))
+                cv2.circle(debug_frame, (0,k["y_intersect"]), 5, (0,255,0), -1)
 
-        # FIXME should really depend on size of image
-        all_h_close = all_h_dists < 5
-        all_v_close = all_v_dists < 5
+        if num_h_classes < 8 or num_h_classes > 9 or num_v_classes < 8 or num_v_classes > 9:
+            return None
 
-        all_h_agg = np.sum(all_h_close, axis=0)
-        all_v_agg = np.sum(all_v_close, axis=0)
+        picked_corners = [ i for i,(x,y) in enumerate(corners) if i in h_assignment and i in v_assignment ]
 
-        is_at_inter = (all_h_agg * all_v_agg) > 0
-
-        for i,(x,y) in enumerate(corners):
-            if is_at_inter[i]:
-                if debug:
+        if debug:
+            for i,(x,y) in enumerate(corners):
+                if i in picked_corners:
                     cv2.circle(debug_frame, (x,y), 5, 255, -1)
-                good_corners.append((x,y))
-            else:
-                if debug:
+                else:
                     cv2.circle(debug_frame, (x,y), 5, 255)
 
-        if good_corners:
-            good_corners_xs, good_corners_ys = [ list(t) for t in zip(*good_corners) ]
+        src_points = np.zeros((len(picked_corners),1,2), np.float32)
+        dst_points = np.zeros((len(picked_corners),1,2), np.float32)
 
-            top_left = (min(good_corners_xs), min(good_corners_ys))
-            bot_right = (max(good_corners_xs), max(good_corners_ys))
+        for j,i in enumerate(picked_corners):
+            x = corners[i][0]
+            y = corners[i][1]
 
-            dim1 = bot_right[0] - top_left[0]
-            dim2 = bot_right[1] - top_left[1]
-            ratio = float(dim1) / float(dim2)
-    
-            if ratio > 0.8 and ratio < 1.2:
-                if debug:
-                    cv2.rectangle(debug_frame, (min(good_corners_xs), min(good_corners_ys)), (max(good_corners_xs), max(good_corners_ys)), (0,0,255), 2)
+            src_points[j][0][0] = x
+            src_points[j][0][1] = y
 
-                src_points = np.zeros((len(good_corners),1,2), np.float32)
-                dst_points = np.zeros((len(good_corners),1,2), np.float32)
+            dst_points[j][0][0] = v_assignment[i] + (9 - num_v_classes) # FIXME
+            dst_points[j][0][1] = h_assignment[i] + (9 - num_h_classes) # Complete Hack
 
-                for i,(x,y) in enumerate(good_corners):
-                    src_points[i][0][0] = x
-                    src_points[i][0][1] = y
+        H, _ = cv2.findHomography(src_points, dst_points * 100.0, cv2.LMEDS)
+        # TODO check somehow that the homography is not completely bogus.
 
-                    xr = np.round(8.0 * float(x - top_left[0]) / float(dim1))
-                    yr = np.round(8.0 * float(y - top_left[1]) / float(dim2)) 
-
-                    dst_points[i][0][0] = xr
-                    dst_points[i][0][1] = yr
-
-                H, _ = cv2.findHomography(src_points, dst_points * 100.0, cv2.LMEDS)
-                # TODO check somehow that the homography is not completely bogus.
-
-                if debug:
-                    cv2.imshow("debug-%d" % r(), debug_frame)
-                return H
+        if debug:
+            cv2.imshow("debug-%d" % r(), debug_frame)
+        return H
 
     if debug:
         cv2.imshow("debug", debug_frame)
@@ -200,3 +216,25 @@ def check_homography(img, H):
     reproj = cv2.warpPerspective(bw, H, (800, 800))
     binary = pipeline.binarize(reproj, 0.2)
     cv2.imshow("binarized-%d" % r(), binary)
+
+def draw_reprojected_chessboard(img, H, color=(0,255,0), thickness=1):
+    """Inverts the homography to display the image with the reprojected chessboard outline."""
+    invertible, Hinv = cv2.invert(H)
+    assert(invertible)
+
+    for i in xrange(0,9):
+        points = np.array([
+            [       0.0, i * 100.0, 1.0 ],
+            [     800.0, i * 100.0, 1.0 ],
+            [ i * 100.0,       0.0, 1.0 ],
+            [ i * 100.0,     800.0, 1.0 ]
+        ], np.float64)
+
+        bpc = np.dot(points, Hinv.T)
+
+        # Convert back from homogeneous to cartesian
+        n = np.divide(bpc, bpc[:,2].reshape(-1,1)).astype(int)
+
+        cv2.line(img, (n[0][0], n[0][1]), (n[1][0], n[1][1]), color, thickness)
+        cv2.line(img, (n[2][0], n[2][1]), (n[3][0], n[3][1]), color, thickness)
+
