@@ -32,14 +32,13 @@ let process position_of_mask mask_input pos_output pos_init =
     let dmove = dmove_of_masks pos m1 m2' in
     begin match move_of_dmove pos dmove with
     | Some move ->
-        let pos' = Ochess.make_move pos move 0 in
         let stable_move = is_stable_move dmove in
-        if stable_move then begin
+        if stable_move then
+          let pos' = make_move pos move in
           emit pos_output (move, pos');
           run position_of_mask pos' (mask_of_position pos') (possible_states_of_position pos')
-        end else begin
+        else
           run position_of_mask pos m1 possible_states
-        end
     | None ->
         run position_of_mask pos m1 possible_states
     end

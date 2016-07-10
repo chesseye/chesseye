@@ -101,6 +101,8 @@ let mask_of_string s : mask =
   done;
   board
 
+let mask_of_position pos =
+  (mask_of_string (string_of_position pos))
 
 let diff_mask (mask1:mask) (mask2:mask) =
   let acc = ref [] in
@@ -147,88 +149,95 @@ let chose_castle_side (c1,c2,c3,c4) =
 (* Main move detection *)
 let dmove_of_masks (p:position) (m1:mask) (m2:mask): dmove =
   let diff = diff_mask m1 m2 in
-  begin match diff with
-  | [] -> DNoMove
-  | [ _ ] -> DError
-  | [ ((i1,j1), Some color1, None);
-      ((i2,j2), None, Some color1'); ]
-  | [ ((i2,j2), None, Some color1');
-      ((i1,j1), Some color1, None); ] ->
-      if color1 = color1' then
-        if p.turn = color1 then DMove (i1, j1, i2, j2)
-        else DUndo
-      else
+  let dmove =
+    begin match diff with
+    | [] -> DNoMove
+    | [ _ ] -> DError
+    | [ ((i1,j1), Some color1, None);
+        ((i2,j2), None, Some color1'); ]
+    | [ ((i2,j2), None, Some color1');
+        ((i1,j1), Some color1, None); ] ->
+          if color1 = color1' && p.turn = color1 then
+            DMove (i1, j1, i2, j2)
+          else
+            DError
+    | [ ((i1,j1), Some color1, None);
+        ((i2,j2), Some color2, Some color1'); ]
+    | [ ((i2,j2), Some color2, Some color1');
+        ((i1,j1), Some color1, None) ] ->
+          if color1 = color1' && color1 <> color2 then
+            DMove (i1, j1, i2, j2)
+          else
+            DError
+    | [ ((i1, j1), Some color1, None);
+        ((i2, j2), Some color2, None);
+        ((i3, j3), None, Some color3); ]
+    | [ ((i1, j1), Some color1, None);
+        ((i3, j3), None, Some color3);
+        ((i2, j2), Some color2, None); ]
+    | [ ((i3, j3), None, Some color3);
+        ((i1, j1), Some color1, None);
+        ((i2, j2), Some color2, None); ]->
+          if color1 = color2 then
+            DError
+          else if color1 = color3 then
+            DEnPassant (color1, (i1, j1, i3, j3), (i2, j2))
+          else if color2 = color3 then
+            DEnPassant (color2, (i2, j2, i3, j3), (i1, j1))
+          else
+            DError
+    (* King side is: K:4->6 && R:7->5 *)
+    (* Queen side is: K:4->2 && R:0->3 *)
+    | [ ((c1, l1), Some color1, None);
+        ((c2, l2), Some color2, None);
+        ((c3, l3), None, Some color3);
+        ((c4, l4), None, Some color4); ]
+    | [ ((c1, l1), Some color1, None);
+        ((c3, l3), None, Some color3);
+        ((c2, l2), Some color2, None);
+        ((c4, l4), None, Some color4); ]
+    | [ ((c1, l1), Some color1, None);
+        ((c3, l3), None, Some color3);
+        ((c4, l4), None, Some color4);
+        ((c2, l2), Some color2, None); ]
+    | [ ((c3, l3), None, Some color3);
+        ((c1, l1), Some color1, None);
+        ((c2, l2), Some color2, None);
+        ((c4, l4), None, Some color4); ]
+    | [ ((c3, l3), None, Some color3);
+        ((c1, l1), Some color1, None);
+        ((c4, l4), None, Some color4);
+        ((c2, l2), Some color2, None); ]
+    | [ ((c3, l3), None, Some color3);
+        ((c4, l4), None, Some color4);
+        ((c1, l1), Some color1, None);
+        ((c2, l2), Some color2, None); ] ->
+	  if (consistent_line_and_color (l1,l2,l3,l4) (color1,color2,color3,color4))
+	  then
+	    chose_castle_side (c1,c2,c3,c4)
+	  else
+	    DError
+    | diff ->
         DError
-  | [ ((i1,j1), Some color1, None);
-      ((i2,j2), Some color2, Some color1'); ]
-  | [ ((i2,j2), Some color2, Some color1');
-      ((i1,j1), Some color1, None) ] ->
-      if color1 = color1' && color1 <> color2 then
-        DMove (i1, j1, i2, j2)
-      else
-        DError
-  | [ ((i1,j1), None, Some color1);
-      ((i2,j2), Some color1', Some color2); ]
-  | [ ((i2,j2), Some color1', Some color2);
-      ((i1,j1), None, Some color1); ] ->
-      if color1 = color1' && color1 <> color2 then
-        DUndo
-      else
-        DError
-  | [ ((i1, j1), Some color1, None);
-      ((i2, j2), Some color2, None);
-      ((i3, j3), None, Some color3); ]
-  | [ ((i1, j1), Some color1, None);
-      ((i3, j3), None, Some color3);
-      ((i2, j2), Some color2, None); ]
-  | [ ((i3, j3), None, Some color3);
-      ((i1, j1), Some color1, None);
-      ((i2, j2), Some color2, None); ]->
-        if color1 = color2 then
-          DError
-        else if color1 = color3 then
-          DEnPassant (color1, (i1, j1, i3, j3), (i2, j2))
-        else if color2 = color3 then
-          DEnPassant (color2, (i2, j2, i3, j3), (i1, j1))
-        else
-          DError
-  (* King side is: K:4->6 && R:7->5 *)
-  (* Queen side is: K:4->2 && R:0->3 *)
-  | [ ((c1, l1), Some color1, None);
-      ((c2, l2), Some color2, None);
-      ((c3, l3), None, Some color3);
-      ((c4, l4), None, Some color4); ]
-  | [ ((c1, l1), Some color1, None);
-      ((c3, l3), None, Some color3);
-      ((c2, l2), Some color2, None);
-      ((c4, l4), None, Some color4); ]
-  | [ ((c1, l1), Some color1, None);
-      ((c3, l3), None, Some color3);
-      ((c4, l4), None, Some color4);
-      ((c2, l2), Some color2, None); ]
-  | [ ((c3, l3), None, Some color3);
-      ((c1, l1), Some color1, None);
-      ((c2, l2), Some color2, None);
-      ((c4, l4), None, Some color4); ]
-  | [ ((c3, l3), None, Some color3);
-      ((c1, l1), Some color1, None);
-      ((c4, l4), None, Some color4);
-      ((c2, l2), Some color2, None); ]
-  | [ ((c3, l3), None, Some color3);
-      ((c4, l4), None, Some color4);
-      ((c1, l1), Some color1, None);
-      ((c2, l2), Some color2, None); ] ->
-	if (consistent_line_and_color (l1,l2,l3,l4) (color1,color2,color3,color4))
-	then
-	  chose_castle_side (c1,c2,c3,c4)
-	else
-	  DError
-  | diff ->
-      DError
+    end
+  in
+  begin match dmove with
+  | DError ->
+      begin match p.prev with
+      | Some previous_pos ->
+          let prev_m = mask_of_position previous_pos in
+          if prev_m = m2 then DUndo
+          else DError
+      | None -> DError
+      end
+  | _ -> dmove
   end
 
 let is_legal_move pos move =
-  List.mem move (Ochess.legal_moves pos)
+  begin match move with
+  | Undo -> true
+  | _ -> List.mem move (Ochess.legal_moves pos)
+  end
 
 let is_promotion pos (i1,j1,i2,j2) =
   false (* TODO *)
@@ -249,10 +258,7 @@ let move_of_dmove pos dmove =
     | DKingside_castle ->
         Some Kingside_castle
     | DUndo ->
-        begin match pos.prev with
-        | Some previous_pos -> Some Undo
-        | None -> None
-        end
+        Some Undo
     | DError -> None
   in
   begin match move_opt with
@@ -264,8 +270,16 @@ let move_of_dmove pos dmove =
   | None -> None
   end
 
-let mask_of_position pos =
-  (mask_of_string (string_of_position pos))
+let make_move pos move =
+  begin match move with
+  | Undo ->
+      begin match pos.prev with
+      | Some previous_pos -> previous_pos
+      | None -> assert false
+      end
+
+  | _ -> Ochess.make_move pos move 0
+  end
 
 let parse_message msg =
   begin match String.sub msg 0 4 with
@@ -285,6 +299,12 @@ let possible_states_of_position pos =
   let moves = Ochess.legal_moves pos in
   let positions =
     List.map (fun move -> Ochess.make_move pos move 0) moves
+  in
+  let positions =
+    begin match pos.prev with
+    | None -> positions
+    | Some p -> p :: positions
+    end
   in
   let can_white = Array.make_matrix 8 8 false in
   let can_black = Array.make_matrix 8 8 false in

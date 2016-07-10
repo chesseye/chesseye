@@ -19,3 +19,4 @@ val print_diff : ((int * int) * color option * color option) list -> unit
 val parse_message : string -> input_message
 val possible_states_of_position : position -> possible_states
 val mask_cleanup : possible_states -> mask -> mask -> mask
+val make_move : position -> move -> position
