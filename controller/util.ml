@@ -240,7 +240,14 @@ let is_legal_move pos move =
   end
 
 let is_promotion pos (i1,j1,i2,j2) =
-  false (* TODO *)
+  begin match pos.ar.(i1).(j1) with
+  | Piece (Pawn, c) when c = pos.turn ->
+      begin match c with
+      | White -> j1 = 6 && j2 = 7
+      | Black -> j1 = 1 && j2 = 0
+      end
+  | _ -> false
+  end
 
 let move_of_dmove pos dmove =
   let move_opt =
@@ -248,7 +255,7 @@ let move_of_dmove pos dmove =
     | DNoMove -> None
     | DMove (i1,j1,i2,j2) ->
         if is_promotion pos (i1,j1,i2,j2) then
-          Some (Promotion (Queen, i1, i2)) (* TODO: check *)
+          Some (Promotion (Queen, i1, i2))
         else
           Some (Move (i1,j1,i2,j2))
     | DEnPassant (color,(i1,j1,i2,j2),(o1,o2)) ->
