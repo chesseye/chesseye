@@ -29,6 +29,9 @@
 \lstnewenvironment{lstrml}%
 {\footnotesize \lstset{language=ReactiveML,keepspaces=true}}
 {}
+\lstnewenvironment{lstpython}%
+{\footnotesize \lstset{language=Python,keepspaces=true}}
+{}
 
 \title{\includegraphics[scale=0.1]{figures/chesseye}
   \\
@@ -203,6 +206,31 @@ let process output_messages position advice =
 \begin{frame}[fragile]
 \frametitle{Voice}
 
+\begin{itemize}
+    \item {\scriptsize \verb.MOVD "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0" "e2e4". }
+\end{itemize}
+
+\pause
+
+\begin{lstpython}
+def pronounce_move(fen_str, uci_str):
+    # Move data re-interpreted by python-chess
+    board = chess.Board(fen_str)
+    move = board.parse_uci(uci_str)
+
+    s = board.san(move) # standard algebraic notation, e.g: "Qxc7"
+
+    s = s.replace("K", "king ")
+    s = s.replace("Q", "queen ")
+    s = s.replace("R", "rook ")
+    s = s.replace("B", "bishop ")
+    s = s.replace("N", "knight ")
+    s = s.replace("x", " takes ")
+    s = s.replace("+", ", check!")
+    s = s.replace("#", ", checkmate!")
+
+    say(san)
+\end{lstpython}
 
 \end{frame}
 
@@ -250,7 +278,6 @@ let process output_messages position advice =
 
 
 % \end{frame}
-
 
 
 
