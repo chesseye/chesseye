@@ -78,8 +78,7 @@ let process check_init pos_inout mask_input r =
     begin match last ?pos_inout with
     | Some (_, p) ->
         if p.number <> Ochess.init_position.number && m = init_mask then
-          (print_endline "REST";
-           emit pos_inout (Undo, Ochess.init_position);
+          (emit pos_inout (Undo, Ochess.init_position);
            emit r)
     | None -> ()
     end
