@@ -1,0 +1,42 @@
+
+\usepackage{listings}
+\lstdefinelanguage{ReactiveML}
+  {morekeywords={assert,asr,class,closed,constraint,external,%
+      functor,include,inherit,land,lazy,lor,lsl,lsr,lxor,method,mod,%
+      module,new,open,parser,private,sig,struct,val,virtual,when,%
+      object,%
+      and,as,begin,do,done,dopar,downto,else,end,exception,for,%
+      fun,function,if,in,let,match,mutable,of,rec,then,%
+      to,try,type,while,with,%
+      process,emit,await,signal,default,gather,present,control,until,%
+      loop,nothing,pause,pre,run,immediate,one.last},%
+   sensitive,%
+   morecomment=[n]{(*}{*)},%
+   morestring=[b]",%
+   moredelim=*[directive]\#,%
+   moredirectives={open,close,include}%
+  }[keywords,comments,strings,directives]%
+
+% \lstset{language=ReactiveML,%
+%    basicstyle=\ttfamily,%
+%    keywordstyle=\bfseries\rmfamily,%
+%    columns=fullflexible,%
+%    moredelim=[is][\itshape]{\#}{\#}%
+% }
+
+\lstset{language=ReactiveML,%
+   basicstyle=\ttfamily,%
+   keywordstyle=\ttfamily,%
+   columns=fullflexible,%
+   moredelim=[is][\itshape]{\#}{\#}%
+}
+
+% \usepackage{alltt}
+% \newenvironment{lstlisting}%
+% {\begin{alltt}}%
+% {\end{alltt}}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "these"
+%%% End: 

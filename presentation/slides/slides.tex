@@ -1,0 +1,167 @@
+\documentclass[t]{beamer}
+\usepackage[utf8x]{inputenc}
+\usepackage{graphicx}
+
+\setbeamercovered{transparent}
+\setbeamersize{text margin left=1em, text margin right=0em}
+\setbeamertemplate{sidebar right}{}
+\setbeamertemplate{footline}{\hfill\insertframenumber{}~~~}
+\setbeamercovered{invisible}
+
+\setbeamertemplate{subsection in toc}[square]
+\AtBeginSubsection[]
+{
+ \begin{frame}<beamer>
+ \frametitle{Overview}
+ \tableofcontents[currentsubsection]
+ \end{frame}
+}
+
+\usepackage{listings}
+\input{rml-listings}
+\lstset{language=ReactiveML,%
+   basicstyle=\ttfamily,%
+   keywordstyle=\color{blue}\ttfamily,%
+   columns=fullflexible,%
+   moredelim=[is][\itshape]{\#}{\#}%
+}
+\lstnewenvironment{lstrml}%
+{\footnotesize \lstset{language=ReactiveML,keepspaces=true}}
+{}
+
+\title{\includegraphics[scale=0.1]{figures/chesseye}
+  \\
+  ChessEye}
+\author{Louis Mandel \and Jerome Simeon \and Philippe Suter}
+\date{Palaver \\ July 12, 2016}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \begin{frame}
+%   \tableofcontents
+% \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Vision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Vision}
+
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Controller}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Controller}
+
+\includegraphics[scale=0.6]{figures/controller}
+
+\pause
+
+\begin{lstrml}
+  signal mask default None gather keep_last in
+  signal position default None gather keep_last in
+  signal advice default None gather keep_last in
+  begin
+    run Bridge.bridge_async mask ||
+    run position_of_mask mask position Ochess.init_position ||
+    run advice_engine position advice ||
+    run output_messages position advice ||
+    run print_position position
+  end
+\end{lstrml}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Controller with reset}
+
+\includegraphics[scale=0.6]{figures/controller-with-reset}
+
+\begin{lstrml}
+  signal mask default None gather keep_last in
+  signal position default None gather keep_last in
+  signal advice default None gather keep_last in
+  signal reset default () gather (fun () () -> ()) in
+  begin
+    run Bridge.bridge_async mask ||
+    loop
+      do
+        run position_of_mask mask position Ochess.init_position
+      until reset done
+    end ||
+    run check_init position mask reset ||
+    ...
+  end
+\end{lstrml}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Voice}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Voice}
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Deliverable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Deliverable}
+
+\begin{center}
+  \includegraphics[scale=0.1]{figures/photo-deliverable-origin}
+\end{center}
+
+\begin{itemize}
+\item Source code: \url{https://github.com/chesseye/chesseye}
+  \medskip
+\item Web site: \url{http://devpost.com/software/chesseye}
+  \medskip
+\item Talk: \url{https://youtu.be/bYtGw61YLRk}
+  \begin{itemize}
+  \item background video: \url{https://vimeo.com/165765674}
+  \end{itemize}
+\end{itemize}
+
+
+\end{frame}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \begin{frame}[fragile]
+% \frametitle{}
+
+
+% \end{frame}
+
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: pdflatex
+%%% TeX-master: "cours"
+%%% End:

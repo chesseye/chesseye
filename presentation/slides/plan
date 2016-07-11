@@ -1,0 +1,24 @@
+Philippe:
+- Intro
+- demo
+- achitecture
+- vision
+
+=> production de mask: python cam/chesseye.py --src=1
+
+Jerome:
+- OCaml
+  - dmove_of_masks (+ types.mli ?)
+
+Louis:
+- ReactiveML
+  - controller
+    - print_position
+  - reset
+
+=> production de messages: python cam/chesseye.py --src=1 | controller/controller -kibbitz 1
+
+Philippe:
+- Voice
+- Deliverable
+- CC
