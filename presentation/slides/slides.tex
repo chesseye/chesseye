@@ -50,6 +50,27 @@
 % \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Architecture}
+
+\begin{center}
+  \includegraphics[scale=0.9]{figures/architecture}
+\end{center}
+\medskip
+
+{\small
+\begin{verbatim}
+$ python cam/chesseye.py --src=1 \
+    | controller/controller -kibbitz 1 \
+    | python voice/speak.py
+\end{verbatim}
+}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Vision}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
