@@ -23,7 +23,8 @@
    basicstyle=\ttfamily,%
    keywordstyle=\color{blue}\ttfamily,%
    columns=fullflexible,%
-   moredelim=[is][\itshape]{\#}{\#}%
+   moredelim=[is][\itshape]{\#}{\#},%
+   showstringspaces=false,%
 }
 \lstnewenvironment{lstrml}%
 {\footnotesize \lstset{language=ReactiveML,keepspaces=true}}
@@ -93,9 +94,65 @@ $ python cam/chesseye.py --src=1 \
 \begin{frame}[fragile]
 \frametitle{Controller}
 
+XXX TODO Jerome XXX
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Controller: architecture}
+
 \includegraphics[scale=0.6]{figures/controller}
 
 \pause
+
+\begin{lstrml}
+  signal mask default None gather keep_last in
+  signal position default None gather keep_last in
+  signal advice default None gather keep_last in
+  begin
+    run Bridge.bridge_async mask ||
+    run position_of_mask mask position Ochess.init_position ||
+    run advice_engine position advice ||
+    run output_messages position advice ||
+    run print_position position
+  end
+\end{lstrml}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Controller: example of process}
+
+\begin{lstrml}
+let process output_messages position advice =
+  loop
+    await position (Some (move, pos)) in
+    print_endline ("MOVD "^(Ochess.long_string_of_move move pos));
+    match Ochess.game_status pos with
+    | Ochess.Win color -> print_endline "ENDG checkmate"
+    | Ochess.Draw -> print_endline "ENDG stalemate"
+    | Ochess.Play _ -> ()
+  end
+  ||
+  loop
+    await advice (Some (pos, smove)) in
+    let msg = Ochess.long_string_of_smove pos smove in
+    print_endline ("KIBB "^msg)
+  end
+\end{lstrml}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Controller}
+
+\includegraphics[scale=0.6]{figures/controller}
 
 \begin{lstrml}
   signal mask default None gather keep_last in
