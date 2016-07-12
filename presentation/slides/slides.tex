@@ -1,5 +1,8 @@
 \documentclass[t]{beamer}
+
 \usepackage[utf8x]{inputenc}
+\usepackage{xskak,chessboard} % for chess positions
+\usepackage{wasysym} % for custom chess pieces in masks
 \usepackage{graphicx}
 
 \setbeamercovered{transparent}
@@ -38,6 +41,8 @@
   ChessEye}
 \author{Louis Mandel \and J{\'e}r{\^o}me Sim{\'e}on \and Philippe Suter}
 \date{Palaver \\ July 12, 2016}
+
+%% Chess diagrams
 
 \begin{document}
 
@@ -89,6 +94,12 @@ $ python cam/chesseye.py --src=1 \
 
 \end{frame}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{MaskToPosition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{toposition}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Controller}

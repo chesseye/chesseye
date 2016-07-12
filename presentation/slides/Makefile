@@ -2,7 +2,7 @@ FILE=slides
 
 pdf :$(FILE).pdf
 
-$(FILE).pdf: $(FILE).tex
+$(FILE).pdf: toposition.tex $(FILE).tex
 	pdflatex $(FILE)
 	pdflatex $(FILE)
 	pdflatex $(FILE)

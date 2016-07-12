@@ -1,0 +1,233 @@
+%% Setup chessboard
+\makeatletter
+\cbDefineNewPiece{white}{C}
+                 {\raisebox{0.08cm}{\cfss@whitepiececolor
+                     $\Circle$}}
+                 {\BlackEmptySquare%
+                   \makebox[0pt][r]{\cfss@whitepiececolor
+                     \raisebox{0.08cm}{%
+                       \makebox[1em]{$\Circle$}}}}
+\cbDefineNewPiece{black}{c}
+                 {\raisebox{0.08cm}{\cfss@blackpiececolor
+                     $\CIRCLE$}}
+                 {\BlackEmptySquare%
+                   \makebox[0pt][r]{\cfss@blackpiececolor
+                     \raisebox{0.08cm}{%
+                       \makebox[1em]{$\CIRCLE$}}}}
+\makeatother
+\setchessboard{tinyboard}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Initial}
+
+%%
+\begin{tabular}{ccc}
+\newchessgame
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cg1,Ch1,Ca2,Cb2,Cc2,Cd2,Ce2,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cg8,ch8,ca7,cb7,cc7,cd7,ce7,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\chessboard
+\end{tabular}
+
+\hidemoves{1. e4}
+\begin{tabular}{ccc}
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cg1,Ch1,Ca2,Cb2,Cc2,Cd2,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cg8,ch8,ca7,cb7,cc7,cd7,ce7,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\raisebox{1.3cm}{\hspace*{1.3cm}{\Large ?}}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Move}
+
+%%
+\begin{tabular}{ccc}
+\chessboard[hideranks={1,2,7,8},pgfstyle=border,color=red,markfields={e2,e4},addpieces={Ce4}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\chessboard[hideranks={1,2,7,8},pgfstyle=straightmove,markmoves={e2-e4}]
+\end{tabular}
+
+\begin{tabular}{ccc}
+\newchessgame
+\chessboard
+\hidemoves{1. e4}
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\chessboard[pgfstyle=straightmove,markmoves={e2-e4}]
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Capture}
+
+%%
+\newgame\longmoves
+{\small \mainline{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6}}
+\begin{tabular}{ccc}
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cd4,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cc7,cd6,ce5,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\chessboard
+\end{tabular}
+
+%%
+\hidemoves{4. dxe5}
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markfields={d4,e5},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Ce5,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cc7,cd6,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\chessboard[pgfstyle=straightmove,markmoves={d4-e5}]
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Capture \emph{en passant}}
+
+%%
+\newgame\longmoves
+{\small \mainline{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5}}
+    
+\begin{tabular}{ccc}
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cd5,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cc5,cd6,ce5,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\chessboard
+\end{tabular}
+
+%%
+\hidemoves{5. dxc6...}
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markfields={d5,c5,c6},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cc6,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cd6,ce5,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\chessboard[pgfstyle=straightmove,markmoves={d5-c6}]
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Castleing \& Promotion}
+
+%%
+{\small \mainline{5... Be7}}
+\newgame\longmoves
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6 Be7}}
+    
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markfields={f8,e7},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cc6,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,ce7,cf6,ch8,ca7,cb7,cd6,ce5,cf7,cg7,ch7}]
+&&
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Castleing \& Promotion}
+
+%%
+\newgame
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6...}}
+{\small \mainline{5... Be7 6. cxb7...}}
+\newgame\longmoves
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6 Be7}}
+    
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markfields={f8,e7},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cc6,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,ce7,cf6,ch8,ca7,cb7,cd6,ce5,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\hidemoves{6. cxb7}
+\chessboard[pgfstyle=border,color=red,markfields={c6,b7},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,ce7,cf6,ch8,ca7,cd6,ce5,cf7,cg7,ch7}]
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Castleing \& Promotion}
+
+%%
+\newgame
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6...}}
+{\small \mainline{5... Be7 6. cxb7 O-O}}
+\newgame\longmoves
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6 Be7}}
+
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markfields={f8,e7},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cc6,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,ce7,cf6,ch8,ca7,cb7,cd6,ce5,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\hidemoves{6. cxb7}
+\chessboard[pgfstyle=border,color=red,markfields={c6,b7},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,ce7,cf6,ch8,ca7,cd6,ce5,cf7,cg7,ch7}]
+\end{tabular}
+\hidemoves{6... O-O}
+
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markregion=e8-h8,addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,cg8,ce7,cf6,cf8,ca7,cd6,ce5,cf7,cg7,ch7}]
+&&
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Castleing \& Promotion}
+
+%%
+\newgame
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6...}}
+{\small \mainline{5... Be7 6. cxb7 O-O 7. bxa8=Q...}}
+\newgame\longmoves
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6 Be7}}
+
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markfields={f8,e7},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cc6,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,ce7,cf6,ch8,ca7,cb7,cd6,ce5,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\hidemoves{6. cxb7}
+\chessboard[pgfstyle=border,color=red,markfields={c6,b7},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,ce7,cf6,ch8,ca7,cd6,ce5,cf7,cg7,ch7}]
+\end{tabular}
+\hidemoves{6... O-O}
+
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,color=red,markregion=e8-h8,addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,cg8,ce7,cf6,cf8,ca7,cd6,ce5,cf7,cg7,ch7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\hidemoves{7. bxa8=Q}
+\chessboard[pgfstyle=border,color=red,markfields={b7,a8},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Ca8,Ce4,Cf2,Cg2,Ch2,
+    cb8,cc8,cd8,cg8,ce7,cf6,cf8,ca7,cd6,ce5,cf7,cg7,ch7}]
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mask to position: Castleing \& Promotion}
+
+%%
+\newgame
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6...}}
+{\small \mainline{5... Be7 6. cxb7 O-O 7. bxa8=Q...}}
+\newgame\longmoves
+{\small \hidemoves{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5 5. dxc6 Be7}}
+
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,pgfstyle=straightmove,markmoves={f8-e7}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\hidemoves{6. cxb7}
+\chessboard[pgfstyle=border,pgfstyle=straightmove,markmoves={c6-b7}]
+\end{tabular}
+\hidemoves{6... O-O}
+
+\begin{tabular}{ccc}
+\chessboard[pgfstyle=border,pgfstyle=curvemove,markmoves={e8-g8,h8-f8}]
+&\raisebox{1.3cm}{$\Longrightarrow$}&
+\hidemoves{7. bxa8=Q}
+\chessboard[pgfstyle=straightmove,markmoves={b7-a8},pgfstyle=circle,color=red,markfields={a8}]
+\end{tabular}
+
+\end{frame}
+
