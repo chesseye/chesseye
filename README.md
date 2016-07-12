@@ -18,7 +18,7 @@ This is the repository of the [ChessEye project, made at Techcrunch Disrupt 2016
 When operating from a file, you can also run the processes independently and save intermediary outputs to a file (it's just pipes after all).
 
 ## Current limitations
-  * Promotion is not supported.
+  * Promotion always promotes to queen
   * Board needs to occupy the majority of the frame and be relatively well aligned with the horizontal/vertical axes.
   * White needs to be "on the right" of the frame.
 
