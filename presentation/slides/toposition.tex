@@ -44,16 +44,21 @@
 
 %%
 \begin{tabular}{ccc}
-\chessboard[hideranks={1,2,7,8},pgfstyle=border,color=red,markfields={e2,e4},addpieces={Ce4}]
+\newchessgame
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cg1,Ch1,Ca2,Cb2,Cc2,Cd2,Ce2,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cg8,ch8,ca7,cb7,cc7,cd7,ce7,cf7,cg7,ch7}]
 &\raisebox{1.3cm}{$\Longrightarrow$}&
-\chessboard[hideranks={1,2,7,8},pgfstyle=straightmove,markmoves={e2-e4}]
+\hidemoves{1. e4}
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cg1,Ch1,Ca2,Cb2,Cc2,Cd2,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cg8,ch8,ca7,cb7,cc7,cd7,ce7,cf7,cg7,ch7},pgfstyle=border,color=red,markfields={e2,e4}]
 \end{tabular}
 
+%%
 \begin{tabular}{ccc}
 \newchessgame
 \chessboard
-\hidemoves{1. e4}
 &\raisebox{1.3cm}{$\Longrightarrow$}&
+\hidemoves{1. e4}
 \chessboard[pgfstyle=straightmove,markmoves={e2-e4}]
 \end{tabular}
 
@@ -166,7 +171,7 @@
 \hidemoves{6... O-O}
 
 \begin{tabular}{ccc}
-\chessboard[pgfstyle=border,color=red,markregion=e8-h8,addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
+\chessboard[pgfstyle=border,color=red,markfields={e8,f8,g8,h8},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
     ca8,cb8,cc8,cd8,cg8,ce7,cf6,cf8,ca7,cd6,ce5,cf7,cg7,ch7}]
 &&
 \end{tabular}
@@ -194,7 +199,7 @@
 \hidemoves{6... O-O}
 
 \begin{tabular}{ccc}
-\chessboard[pgfstyle=border,color=red,markregion=e8-h8,addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
+\chessboard[pgfstyle=border,color=red,markfields={e8,f8,g8,h8},addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cb7,Ce4,Cf2,Cg2,Ch2,
     ca8,cb8,cc8,cd8,cg8,ce7,cf6,cf8,ca7,cd6,ce5,cf7,cg7,ch7}]
 &\raisebox{1.3cm}{$\Longrightarrow$}&
 \hidemoves{7. bxa8=Q}
