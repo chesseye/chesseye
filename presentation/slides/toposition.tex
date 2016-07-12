@@ -231,3 +231,29 @@
 
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Position of mask: Noise}
+
+%%
+\newgame\longmoves
+{\small \mainline{1.ce4 ce5 2.Nf3 Nf6 3. d4 d6 4. d5 c5}}
+    
+\begin{tabular}{ccc}
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cd5,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cc5,cd6,ce5,cf7,cg7,ch7}]
+&&
+\chessboard[addpieces={Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cd5,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cc5,cd6,ce5,cf7,cg7,ch7},hidefield=a1,pgfstyle=border,color=red,markfields={a1}]
+\end{tabular}
+
+%%
+\begin{tabular}{ccc}
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cd5,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cc5,cd6,ce5,cf7,cg7,ch7,Ch5},pgfstyle=border,color=red,markfields={e1,h5}]
+&&
+\chessboard[addpieces={Ca1,Cb1,Cc1,Cd1,Ce1,Cf1,Cf3,Ch1,Ca2,Cb2,Cc2,Cd5,Ce4,Cf2,Cg2,Ch2,
+    ca8,cb8,cc8,cd8,ce8,cf8,cf6,ch8,ca7,cb7,cc5,cd6,ce5,cf7,cg7,ch7,cc4,cb4,cd4,cb3,cd3,cd5,cf5,ce5,ce4,ce6},pgfstyle=border,color=red,markfields={b4,c4,d4,b3,d3,d5,f5,e5,e4,e6}]
+\end{tabular}
+
+\end{frame}
+
