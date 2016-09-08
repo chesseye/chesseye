@@ -106,6 +106,7 @@ def filter_corner_and_lines(corners, h_lines, v_lines, max_dist):
 
 # Returns a homography to project onto a 800x800 image.
 def find_homography(frame, debug=False):
+    debug = True
     if debug:
         debug_frame = np.copy(frame)
 
@@ -126,6 +127,8 @@ def find_homography(frame, debug=False):
     # Thresholded. The chessboard should be black/white after this step.
     binary = pipeline.binarize(bw, 0.2)
 
+    cv2.imshow("binary", binary)
+
     # Edge detector.
     # FIXME check constants? which ones depend on image size?
     edges = cv2.Canny(binary, 100, 250, apertureSize = 3)
@@ -133,6 +136,8 @@ def find_homography(frame, debug=False):
     # Thicker edges.
     # FIXME depends on image size?
     thick_edges = cv2.dilate(edges, cv2.getStructuringElement(cv2.MORPH_CROSS,(4,4)))
+
+    cv2.imshow("thick", thick_edges)
 
     # Looking for lines now
     lines = cv2.HoughLines(thick_edges, 1, np.pi / 180, int(min_board_size))
@@ -207,7 +212,7 @@ def find_homography(frame, debug=False):
         return H
 
     if debug:
-        cv2.imshow("debug", debug_frame)
+        cv2.imshow("debug-%d" % r(), debug_frame)
 
     return None
 

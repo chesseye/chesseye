@@ -1,6 +1,18 @@
 import cv2
 import numpy as np
 
+# Resizes an image so that it fits in the "box"
+def resize_bounded(img, max_width, max_height):
+    h, w = img.shape[:2]
+    if w <= max_width and h <= max_height:
+        return img
+
+
+    f = min(float(max_height) / float(h), float(max_width) / float(w))
+    print f
+    return cv2.resize(img, (int(w * f), int(h * f)))
+
+
 # Converts an image to grayscale.
 def to_gray(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

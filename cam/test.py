@@ -29,10 +29,22 @@ class HomographyTests(unittest.TestCase):
             fn = d["filename"]
             img = cv2.imread(fn)
 
-            H = homography.find_homography(img, debug=False)
+            img = pipeline.resize_bounded(img, 800, 600)
+
+            cv2.imshow("img", img)
+            cv2.waitKey(0)
+
+            H = homography.find_homography(img, debug=True)
+
+            print H
+            cv2.waitKey(0)
 
             # Checks that we find a chessboard.
             self.assertTrue(H is not None, "In image '%s', could not find homography." % d["filename"])
+
+            homography.draw_reprojected_chessboard(img, H, thickness=2)
+            cv2.imshow("img",img)
+            cv2.waitKey(0)
 
             # If the corner positions in the original image are available in
             # the metadata, we invert the homography to compute where we would
