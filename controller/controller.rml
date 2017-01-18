@@ -71,7 +71,7 @@ let rec process advice_engine pos_input advice_output =
       emit advice_output (pos, smove)
     until pos_input done
 
-let process check_init pos_inout mask_input r =
+let process check_init pos_inout mask_input reset =
   let init_mask = mask_of_position Ochess.init_position in
   loop
     await mask_input(Some m) in
@@ -79,7 +79,7 @@ let process check_init pos_inout mask_input r =
     | Some (_, p) ->
         if p.number <> Ochess.init_position.number && m = init_mask then
           (emit pos_inout (Undo, Ochess.init_position);
-           emit r)
+           emit reset Ochess.init_position)
     | None -> ()
     end
   end
@@ -109,7 +109,7 @@ let process output_messages position reset advice =
   end
   ||
   loop
-    await reset ( () ) in
+    await reset (Some pos) in
     print_endline "REST"
   end
   ||
@@ -119,9 +119,16 @@ let process output_messages position reset advice =
     print_endline ("KIBB "^msg)
   end
 
+let rec process resetable_position_of_mask reset mask position pos_init =
+  do
+    run position_of_mask mask position pos_init
+  until reset(Some pos) ->
+    run resetable_position_of_mask reset mask position pos
+  done
+
 let process main =
   print_endline "The ChessEye controller is running";
-  signal reset default () gather (fun () () -> ()) in
+  signal reset default None gather keep_last in
   signal mask default None gather keep_last in
   signal position default None gather keep_last in
   signal advice default None gather keep_last in
@@ -132,11 +139,7 @@ let process main =
       run Bridge.bridge_sync mask;
     exit 0
     ||
-    loop
-      do
-        run position_of_mask mask position Ochess.init_position
-      until reset done
-    end
+    run resetable_position_of_mask reset mask position Ochess.init_position
     ||
     run print_position position
     ||
