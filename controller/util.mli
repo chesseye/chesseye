@@ -21,6 +21,5 @@ val possible_states_of_position : position -> possible_states
 val mask_cleanup : possible_states -> mask -> mask -> mask
 val make_move : position -> move -> position
 
-val fen_of_position : position -> string
-val position_of_fen : string -> position
-
+val full_suggestion : position -> string
+val print_full_suggestion : position -> unit

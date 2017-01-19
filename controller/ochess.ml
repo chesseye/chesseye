@@ -101,10 +101,10 @@ let rec rassoc x lst =
   | (a, b) :: t -> if x = b then a else rassoc x t
   end
 
-let piece_type_of_char c = rassoc (Char.uppercase_ascii c) piece_chars
+let piece_type_of_char c = rassoc (Char.uppercase (*_ascii*) c) piece_chars
 
 let int_of_letter x =
-  let x = Char.lowercase_ascii x in
+  let x = Char.lowercase (*_ascii*) x in
   if 'a' <= x && x <= 'h'
   then int_of_char x - int_of_char 'a'
   else raise Not_found
@@ -676,7 +676,7 @@ let print_move (p:position) (m:move) = (* does not check validity *)
   | Queenside_castle -> printf "O-O-O"
   | Promotion(pt, x1, x2) ->
       let (y1, y2) = ( match p.turn with White -> (6,7) | Black -> (1, 0)) in
-      printf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase_ascii (char_of_piece_type pt))
+      printf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (*_ascii*) (char_of_piece_type pt))
   | Undo -> printf "Undo"
   end
 
@@ -691,7 +691,7 @@ let string_of_move (p:position) (m:move) : string = (* does not check validity *
   | Queenside_castle -> Printf.sprintf "O-O-O"
   | Promotion(pt, x1, x2) ->
       let (y1, y2) = (match p.turn with White -> (6,7) | Black -> (1, 0)) in
-      Printf.sprintf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase_ascii (char_of_piece_type pt))
+      Printf.sprintf "%c%d%c%d%c" (letter_of_int x1) (y1 + 1) (letter_of_int x2) (y2 + 1) (Char.lowercase (*_ascii*) (char_of_piece_type pt))
   | Undo -> "Undo"
   end
 
@@ -827,146 +827,6 @@ let suggest_move pos =
           SuggestedMove mv
       end
   end
-
-let string_of_white_piece p =
-  begin match p with
-  | King -> "K"
-  | Queen -> "Q"
-  | Rook -> "R"
-  | Bishop -> "B"
-  | Knight -> "N"
-  | Pawn -> "P"
-  end
-
-let string_of_black_piece p =
-  begin match p with
-  | King -> "k"
-  | Queen -> "q"
-  | Rook -> "r"
-  | Bishop -> "b"
-  | Knight -> "n"
-  | Pawn -> "p"
-  end
-
-let string_of_char c =
-  String.init 1 (fun i -> c)
-let piece_of_string p =
-  match p with
-  | 'K' -> (King,White) | 'k' -> (King,Black)
-  | 'Q' -> (Queen,White) | 'q' -> (Queen,Black)
-  | 'R' -> (Rook,White) | 'r' -> (Rook,Black)
-  | 'B' -> (Bishop,White) | 'b' -> (Bishop,Black)
-  | 'N' -> (Knight,White) | 'n' -> (Knight,Black)
-  | 'P' -> (Pawn,White) | 'p' -> (Pawn,Black)
-  | _ -> raise (Failure ("Unknown piece: " ^ (string_of_char p)))
-	
-let string_of_black_piece p =
-  match p with
-  | King -> "k" | Queen -> "q" | Rook -> "r" | Bishop -> "b" | Knight -> "n" | Pawn -> "p"
-
-let string_of_turn turn =
-  begin match turn with
-  | White -> "w"
-  | Black -> "b"
-  end
-
-let string_of_castling pos =
-  let acc = ref "" in
-  begin match pos.cas_w with
-  | (true,true) -> acc := !acc ^ "KQ"
-  | (false,true) -> acc := !acc ^ "K"
-  | (true,false) -> acc := !acc ^ "Q"
-  | (false,false) -> ()
-  end;
-  begin match pos.cas_b with
-  | (true,true) -> acc := !acc ^ "kq"
-  | (false,true) -> acc := !acc ^ "k"
-  | (true,false) -> acc := !acc ^ "q"
-  | (false,false) -> ()
-  end;
-  if !acc = "" then "-" else !acc
-
-let string_of_enpassant pos =
-  begin match pos.en_passant with
-  | None -> "-"
-  | Some col ->
-      begin match pos.turn with
-      | White -> Printf.sprintf "%c6" (letter_of_int col)
-      | Black -> Printf.sprintf "%c3" (letter_of_int col)
-      end
-  end
-
-let edwards_of_position pos =
-  let acc = ref "" in
-  let empties = ref 0 in
-  for j = 7 downto 0 do
-    for i = 0 to 7 do
-      begin match pos.ar.(i).(j) with
-      | Empty -> incr empties
-      | Piece (pt,White) ->
-	  begin
-	    if !empties = 0
-	    then
-	      acc := !acc ^ (string_of_white_piece pt)
-	    else
-	      begin
-		acc := !acc ^ (string_of_int !empties) ^ (string_of_white_piece pt);
-		empties := 0;
-	      end
-	  end
-      | Piece (pt,Black) ->
-	  begin
-	    if !empties = 0
-	    then
-	      acc := !acc ^ (string_of_black_piece pt)
-	    else
-	      begin
-		acc := !acc ^ (string_of_int !empties) ^ (string_of_black_piece pt);
-		empties := 0
-	      end
-	  end
-      end
-    done;
-    let trans = if j = 0 then " " else "/" in
-    if !empties = 0
-    then
-      acc := !acc ^ trans
-    else
-      begin
-	acc := !acc ^ (string_of_int !empties) ^ trans;
-	empties := 0
-      end
-  done;
-  begin
-    acc := !acc ^ (string_of_turn pos.turn) ^ " ";
-    acc := !acc ^ (string_of_castling pos) ^ " ";
-    acc := !acc ^ (string_of_enpassant pos) ^ " ";
-    acc := !acc ^ (string_of_int pos.irr_change) ^ " ";
-    acc := !acc ^ (string_of_int pos.number)
-  end;
-  !acc
-
-let print_edwards pos =
-  printf "\n[Edwards][%s]\n" (edwards_of_position pos)
-
-let long_string_of_smove pos smove =
-  let ed = edwards_of_position pos in
-  "\"" ^ ed ^ "\" \"" ^ (string_of_smove pos smove) ^ "\""
-
-let long_string_of_move move pos =
-  begin match pos.prev with
-  | Some prev ->
-      let ed = edwards_of_position prev in
-      "\"" ^ ed ^ "\" \"" ^ (string_of_move prev move) ^ "\""
-  | None ->
-      "INIT"
-  end
-
-let full_suggestion pos =
-  long_string_of_smove pos (suggest_move pos)
-
-let print_full_suggestion pos =
-  printf "%s\n" (full_suggestion pos)
 
 let main () =
   set_signal sigint Signal_ignore; (* xboard sends these *)

@@ -49,7 +49,7 @@ let process position_of_mask mask_input pos_output pos_init =
 let process print_position pos_input =
   loop
     await pos_input(Some (move, pos)) in
-    Ochess.print_full_suggestion pos;
+    Util.print_full_suggestion pos;
     Ochess.print_position pos
   end
 
@@ -85,9 +85,9 @@ let process check_init pos_inout mask_input reset =
   end
 
 let test_position pos : unit =
-  let fen1 = Util.fen_of_position pos in
-  let pos2 = Util.position_of_fen fen1 in
-  let fen2 = Util.fen_of_position pos2 in
+  let fen1 = Fen.fen_of_position pos in
+  let pos2 = Fen.position_of_fen fen1 in
+  let fen2 = Fen.fen_of_position pos2 in
   if (fen1 = fen2)
   then ()
   else
@@ -100,7 +100,7 @@ let process output_messages position reset advice =
   loop
     await position (Some (move, pos)) in
     (* test_position pos; (* round-tripping test for the fen notation import/export *) *)
-    let full_pos = (Ochess.long_string_of_move move pos) in
+    let full_pos = (Fen.long_string_of_move move pos) in
     print_endline ("MOVD "^full_pos);
     match Ochess.game_status pos with
     | Ochess.Win color -> print_endline "ENDG checkmate"
@@ -115,7 +115,7 @@ let process output_messages position reset advice =
   ||
   loop
     await advice (Some (pos, smove)) in
-    let msg = Ochess.long_string_of_smove pos smove in
+    let msg = Fen.long_string_of_smove pos smove in
     print_endline ("KIBB "^msg)
   end
 
