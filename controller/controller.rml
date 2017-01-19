@@ -84,10 +84,24 @@ let process check_init pos_inout mask_input r =
     end
   end
 
+let test_position pos : unit =
+  let fen1 = Util.fen_of_position pos in
+  let pos2 = Util.position_of_fen fen1 in
+  let fen2 = Util.fen_of_position pos2 in
+  if (fen1 = fen2)
+  then ()
+  else
+    begin
+      print_endline ("FEN1: " ^ fen1);
+      print_endline ("FEN2: " ^ fen2)
+    end
+    
 let process output_messages position reset advice =
   loop
     await position (Some (move, pos)) in
-    print_endline ("MOVD "^(Ochess.long_string_of_move move pos));
+    (* test_position pos; (* round-tripping test for the fen notation import/export *) *)
+    let full_pos = (Ochess.long_string_of_move move pos) in
+    print_endline ("MOVD "^full_pos);
     match Ochess.game_status pos with
     | Ochess.Win color -> print_endline "ENDG checkmate"
     | Ochess.Draw -> print_endline "ENDG stalemate"
