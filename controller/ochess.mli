@@ -84,6 +84,7 @@ val string_of_move : position -> move -> string
 val string_of_smove : position -> smove -> string
 val long_string_of_smove : position -> smove -> string
 val long_string_of_move : move -> position -> string
+val piece_of_string : char -> piece
 val edwards_of_position : position -> string
 val print_edwards : position -> unit
 val full_suggestion : position -> string

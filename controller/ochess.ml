@@ -670,6 +670,22 @@ let string_of_black_piece p =
   match p with
   | King -> "k" | Queen -> "q" | Rook -> "r" | Bishop -> "b" | Knight -> "n" | Pawn -> "p"
 
+let string_of_char c =
+  String.init 1 (fun i -> c)
+let piece_of_string p =
+  match p with
+  | 'K' -> (King,White) | 'k' -> (King,Black)
+  | 'Q' -> (Queen,White) | 'q' -> (Queen,Black)
+  | 'R' -> (Rook,White) | 'r' -> (Rook,Black)
+  | 'B' -> (Bishop,White) | 'b' -> (Bishop,Black)
+  | 'N' -> (Knight,White) | 'n' -> (Knight,Black)
+  | 'P' -> (Pawn,White) | 'p' -> (Pawn,Black)
+  | _ -> raise (Failure ("Unknown piece: " ^ (string_of_char p)))
+	
+let string_of_black_piece p =
+  match p with
+  | King -> "k" | Queen -> "q" | Rook -> "r" | Bishop -> "b" | Knight -> "n" | Pawn -> "p"
+
 let string_of_turn turn =
   match turn with
   | White -> "w"

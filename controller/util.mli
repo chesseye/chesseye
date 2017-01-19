@@ -20,3 +20,7 @@ val parse_message : string -> input_message
 val possible_states_of_position : position -> possible_states
 val mask_cleanup : possible_states -> mask -> mask -> mask
 val make_move : position -> move -> position
+
+val fen_of_position : position -> string
+val position_of_fen : string -> position
+
