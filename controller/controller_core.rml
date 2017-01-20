@@ -65,7 +65,7 @@ let rec process advice_engine pos_input advice_output =
   await pos_input (Some (_, pos)) in
   run advice_engine pos_input advice_output
   ||
-  if List.mem pos.turn Config.advices then
+  if List.mem pos.turn !Config.advices then
     do
       let smove = run Rml_async.proc_of_fun Ochess.suggest_move pos in
       emit advice_output (pos, smove)
@@ -126,17 +126,18 @@ let rec process resetable_position_of_mask reset mask position pos_init =
     run resetable_position_of_mask reset mask position pos
   done
 
+signal reset default None gather keep_last;;
+
 let process main =
   print_endline "The ChessEye controller is running";
-  signal reset default None gather keep_last in
   signal mask default None gather keep_last in
   signal position default None gather keep_last in
   signal advice default None gather keep_last in
   begin
-    if Config.async_input then
-      run Bridge.bridge_async mask
+    if !Config.sync_input then
+      run Bridge.bridge_sync mask
     else
-      run Bridge.bridge_sync mask;
+      run Bridge.bridge_async mask;
     exit 0
     ||
     run resetable_position_of_mask reset mask position Ochess.init_position

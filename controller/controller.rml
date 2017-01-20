@@ -1,2 +1,7 @@
 
-let () = run Controller_core.main
+let () =
+  Arg.parse
+    (Arg.align Config.options)
+    (fun _ -> ())
+    (Sys.argv.(0)^" [options]");
+  run Controller_core.main
