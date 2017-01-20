@@ -1,0 +1,157 @@
+open Types
+open Util
+
+let nb_repetition dmov =
+  begin match dmov with
+  | DUndo -> 3
+  | _ -> 2
+  end
+
+let is_stable_move =
+  let map = ref Dmov_map.empty in
+  fun dmov ->
+    try
+      let history = Dmov_map.find dmov !map in
+      let now = Unix.gettimeofday () in
+      let stable =
+        if List.length history >= (nb_repetition dmov) then
+          true
+        else
+          List.exists (fun t -> now -. t > 1.) history
+      in
+      map := if stable then Dmov_map.empty else Dmov_map.add dmov now !map;
+      stable
+    with Not_found ->
+      map := Dmov_map.add dmov (Unix.gettimeofday ()) !map;
+      false
+
+let process position_of_mask mask_input pos_output pos_init =
+  let rec process position_of_mask pos m1 possible_states =
+    await mask_input (Some m2) in
+    let m2' = mask_cleanup possible_states m1 m2 in
+    let dmove = dmove_of_masks pos m1 m2' in
+    begin match move_of_dmove pos dmove with
+    | Some move ->
+        let stable_move = is_stable_move dmove in
+        if stable_move then
+          let pos' = make_move pos move in
+          emit pos_output (move, pos');
+          run position_of_mask pos' (mask_of_position pos') (possible_states_of_position pos')
+        else
+          run position_of_mask pos m1 possible_states
+    | None ->
+        run position_of_mask pos m1 possible_states
+    end
+  in
+  run position_of_mask pos_init (mask_of_position pos_init) (possible_states_of_position pos_init)
+
+
+let process print_position pos_input =
+  loop
+    await pos_input(Some (move, pos)) in
+    Util.print_full_suggestion pos;
+    Ochess.print_position pos
+  end
+
+let keep_last x y =
+  begin match y with
+  | None -> Some x
+  | Some _ ->
+      warning "Drop event";
+      Some x
+  end
+
+let rec process advice_engine pos_input advice_output =
+  await pos_input (Some (_, pos)) in
+  run advice_engine pos_input advice_output
+  ||
+  if List.mem pos.turn Config.advices then
+    do
+      let smove = run Rml_async.proc_of_fun Ochess.suggest_move pos in
+      emit advice_output (pos, smove)
+    until pos_input done
+
+let process check_init pos_inout mask_input reset =
+  let init_mask = mask_of_position Ochess.init_position in
+  loop
+    await mask_input(Some m) in
+    begin match last ?pos_inout with
+    | Some (_, p) ->
+        if p.number <> Ochess.init_position.number && m = init_mask then
+          (emit pos_inout (Undo, Ochess.init_position);
+           emit reset Ochess.init_position)
+    | None -> ()
+    end
+  end
+
+let test_position pos : unit =
+  let fen1 = Fen.fen_of_position pos in
+  let pos2 = Fen.position_of_fen fen1 in
+  let fen2 = Fen.fen_of_position pos2 in
+  if (fen1 = fen2)
+  then ()
+  else
+    begin
+      print_endline ("FEN1: " ^ fen1);
+      print_endline ("FEN2: " ^ fen2)
+    end
+    
+let process output_messages position reset advice =
+  loop
+    await position (Some (move, pos)) in
+    (* test_position pos; (* round-tripping test for the fen notation import/export *) *)
+    let full_pos = (Fen.long_string_of_move move pos) in
+    print_endline ("MOVD "^full_pos);
+    match Ochess.game_status pos with
+    | Ochess.Win color -> print_endline "ENDG checkmate"
+    | Ochess.Draw -> print_endline "ENDG stalemate"
+    | Ochess.Play _ -> ()
+  end
+  ||
+  loop
+    await reset (Some pos) in
+    print_endline "REST"
+  end
+  ||
+  loop
+    await advice (Some (pos, smove)) in
+    let msg = Fen.long_string_of_smove pos smove in
+    print_endline ("KIBB "^msg)
+  end
+
+let rec process resetable_position_of_mask reset mask position pos_init =
+  do
+    run position_of_mask mask position pos_init
+  until reset(Some pos) ->
+    run resetable_position_of_mask reset mask position pos
+  done
+
+let process main =
+  print_endline "The ChessEye controller is running";
+  signal reset default None gather keep_last in
+  signal mask default None gather keep_last in
+  signal position default None gather keep_last in
+  signal advice default None gather keep_last in
+  begin
+    if Config.async_input then
+      run Bridge.bridge_async mask
+    else
+      run Bridge.bridge_sync mask;
+    exit 0
+    ||
+    run resetable_position_of_mask reset mask position Ochess.init_position
+    ||
+    run print_position position
+    ||
+    run output_messages position reset advice
+    ||
+    run advice_engine position advice
+    ||
+    run check_init position mask reset
+    ||
+    loop
+      flush stderr;
+      flush stdout;
+      pause
+    end
+  end
