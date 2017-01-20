@@ -42,6 +42,6 @@ clean:
 	ocamlbuild -clean
 
 realclean: clean
-	rm -f *~ ochess simul
+	rm -f *~ ochess simul controller slowdown
 
 cleanall: realclean
