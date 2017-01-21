@@ -127,11 +127,11 @@ let rec process resetable_position_of_mask reset mask position pos_init =
   done
 
 signal reset default None gather keep_last;;
+signal position default None gather keep_last;;
 
 let process main =
   print_endline "The ChessEye controller is running";
   signal mask default None gather keep_last in
-  signal position default None gather keep_last in
   signal advice default None gather keep_last in
   begin
     if !Config.sync_input then
