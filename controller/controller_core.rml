@@ -126,6 +126,7 @@ let rec process resetable_position_of_mask reset mask position pos_init =
     run resetable_position_of_mask reset mask position pos
   done
 
+signal text default "" gather (fun x y -> y^x);;
 signal reset default None gather keep_last;;
 signal position default None gather keep_last;;
 
@@ -135,9 +136,9 @@ let process main =
   signal advice default None gather keep_last in
   begin
     if !Config.sync_input then
-      run Bridge.bridge_sync mask
+      run Bridge.bridge_sync mask text
     else
-      run Bridge.bridge_async mask;
+      run Bridge.bridge_async mask text;
     exit 0
     ||
     run resetable_position_of_mask reset mask position Ochess.init_position

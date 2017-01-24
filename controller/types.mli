@@ -39,6 +39,7 @@ type input_message =
   | MASK of mask
   | OBST
   | NOCB
+  | TEXT of string
   | OTHER of string
 type possible_states =
     { moves : move list;

@@ -296,6 +296,8 @@ let parse_message msg =
       OBST
   | "NOCB" ->
       NOCB
+  | "TEXT" ->
+      TEXT (String.sub msg 5 (String.length msg - 5))
   | _ ->
       OTHER msg
   end

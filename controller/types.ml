@@ -45,6 +45,7 @@ type input_message =
   | MASK of mask
   | OBST (* No visible mask *)
   | NOCB (* No chess board *)
+  | TEXT of string
   | OTHER of string
 
 type possible_states =

@@ -2,7 +2,7 @@ open Types
 open Util
 
 
-let bridge s =
+let bridge s text =
   try
     while true do
       let line = input_line stdin in
@@ -10,6 +10,8 @@ let bridge s =
       | MASK m -> Rml_async.safe_emit s m
       | OBST -> print_endline "OBST"
       | NOCB -> print_endline "NOCB"
+      | TEXT msg ->
+          Rml_async.safe_emit text msg
       | OTHER msg -> print_endline msg
       end
     done
@@ -17,11 +19,11 @@ let bridge s =
   | _ -> ()
 
 
-let process bridge_async s =
-  run Rml_async.proc_of_fun bridge s
+let process bridge_async s text =
+  run Rml_async.proc_of_fun (bridge s) text
 
 
-let rec process bridge_sync s =
+let rec process bridge_sync s text =
   let line_opt =
     try Some (input_line stdin) with _ -> None
   in
@@ -31,10 +33,11 @@ let rec process bridge_sync s =
       | MASK m -> Rml_async.safe_emit s m
       | OBST -> print_endline "OBST"
       | NOCB -> print_endline "NOCB"
+      | TEXT msg -> Rml_async.safe_emit text msg
       | OTHER msg -> print_endline msg
       end;
       pause;
-      run bridge_sync s
+      run bridge_sync s text
   | None -> ()
   end
 
