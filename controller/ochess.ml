@@ -813,9 +813,9 @@ let parse_level a1 a2 a3 =  (* time control command Xboard calls 'level' *)
 let suggest_move pos =
   let game_over msg = GameOver msg in
   begin match game_status pos with
-  | Draw      -> game_over "1/2-1/2 {Draw}\n"
-  | Win White -> game_over "1-0 {White wins}\n"
-  | Win Black -> game_over "0-1 {Black wins}\n"
+  | Draw      -> game_over "1/2-1/2 {Draw}"
+  | Win White -> game_over "1-0 {White wins}"
+  | Win Black -> game_over "0-1 {Black wins}"
   | Play lm ->
       (* SuggestedMove (List.hd lm) *)
       assert (lm <> []);
