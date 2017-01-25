@@ -139,6 +139,7 @@ let process main =
       run Bridge.bridge_sync mask text
     else
       run Bridge.bridge_async mask text;
+    print_endline "The ChessEye controller is exiting";
     exit 0
     ||
     run resetable_position_of_mask reset mask position Ochess.init_position

@@ -289,17 +289,21 @@ let make_move pos move =
   end
 
 let parse_message msg =
-  begin match String.sub msg 0 4 with
-  | "MASK" ->
-      MASK (mask_of_string (String.sub msg 5 128))
-  | "OBST" ->
-      OBST
-  | "NOCB" ->
-      NOCB
-  | "TEXT" ->
-      TEXT (String.sub msg 5 (String.length msg - 5))
-  | _ ->
-      OTHER msg
+  begin try
+    begin match String.sub msg 0 4 with
+    | "MASK" ->
+        MASK (mask_of_string (String.sub msg 5 128))
+    | "OBST" ->
+        OBST
+    | "NOCB" ->
+        NOCB
+    | "TEXT" ->
+        TEXT (String.sub msg 5 (String.length msg - 5))
+    | _ ->
+        OTHER msg
+    end
+  with Invalid_argument _ ->
+    OTHER msg
   end
 
 exception Break

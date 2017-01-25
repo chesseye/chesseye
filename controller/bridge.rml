@@ -16,7 +16,7 @@ let bridge s text =
       end
     done
   with
-  | _ -> ()
+  | End_of_file -> ()
 
 
 let process bridge_async s text =
