@@ -83,7 +83,8 @@ if __name__ == "__main__":
                 say("The board was reset.")
             elif verb == "ENDG":
                 say("The game is over by " + rest)
-
+            elif verb == "CBOT":
+                say(rest)
             if verb == "REST":
                 last_was_rest = True
             else:
