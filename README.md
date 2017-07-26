@@ -1,7 +1,7 @@
 # Readme
 
 This is the repository of the [ChessEye project, made at Techcrunch Disrupt 2016](http://devpost.com/software/chesseye).
-A 1 minite presentation video is [availble](https://youtu.be/bYtGw61YLRk).
+A one minute presentation video is [available](https://youtu.be/bYtGw61YLRk).
 
 ## Prerequisites
   * Python with OpenCV (tested with 3.1.0)
